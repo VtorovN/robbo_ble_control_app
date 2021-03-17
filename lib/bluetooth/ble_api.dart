@@ -1,16 +1,22 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
 class BLEAPI {
   static BLEAPI instance = new BLEAPI();
   static BluetoothDevice _connectedDevice;
+  static FlutterBlue _fb = FlutterBlue.instance;
 
-  Future<void> startScan() {
-    return FlutterBlue.instance.startScan(timeout: Duration(seconds: 5));
+  Future<void> startScan() async {
+    if (!(await _fb.isScanning.isEmpty) && await _fb.isScanning.first == false) {
+      return _fb.startScan(timeout: Duration(seconds: 5));
+    }
+  }
+
+  Future<void> stopScan() async {
+    return _fb.stopScan();
   }
 
   Stream<List<ScanResult>> getScanResults() {
-    return FlutterBlue.instance.scanResults;
+    return _fb.scanResults;
   }
 
   Future<bool> connect(BluetoothDevice device) async {
@@ -18,9 +24,9 @@ class BLEAPI {
       await disconnect();
     }
 
-    await device.connect();
+    await device.connect(autoConnect: false);
 
-    List<BluetoothDevice> connectedDevices = await FlutterBlue.instance.connectedDevices;
+    List<BluetoothDevice> connectedDevices = await _fb.connectedDevices;
     if(connectedDevices.contains(device)) {
       _connectedDevice = device;
       return true;
@@ -33,10 +39,27 @@ class BLEAPI {
     _connectedDevice = null;
   }
 
+  Future<bool> isConnected() async {
+    List<BluetoothDevice> connectedDevices = await _fb.connectedDevices;
+    if(connectedDevices.contains(_connectedDevice)) {
+      return true;
+    }
+    else {
+      _connectedDevice = null;
+      return false;
+    }
+  }
+
   Future<List<BluetoothService>> getServices() async {
     if (_connectedDevice != null) {
       return _connectedDevice.discoverServices();
     }
     else return null;
   }
+
+  Stream<bool> isScanningStream() {
+    return _fb.isScanning;
+  }
+
+  BluetoothDevice get connectedDevice => _connectedDevice;
 }
