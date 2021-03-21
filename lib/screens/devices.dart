@@ -11,13 +11,30 @@ class DevicesScreen extends StatefulWidget {
 
 class _DevicesScreenState extends State<DevicesScreen> {
 
+  Widget _buildBluetoothStateScreen(BuildContext context, BluetoothState bluetoothState) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              Icons.bluetooth_disabled,
+              size: 200.0,
+              color: Colors.black,
+            ),
+            Text(
+              'Bluetooth Adapter is ${bluetoothState != null ? bluetoothState.toString().substring(15) : 'not available'}.',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildDeviceList(BuildContext context) {
     BLEAPI.instance.startScan();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Devices"),
-      ),
       body: RefreshIndicator(
         onRefresh: () => BLEAPI.instance.startScan(),
         child: SingleChildScrollView(
@@ -136,26 +153,39 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: BLEAPI.instance.isConnected(),
-      initialData: false,
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (snapshot.hasData && snapshot.data) {
-          return FutureBuilder<Widget> (
-              future: _buildDeviceInfo(context),
-              initialData: CircularProgressIndicator(),
-              builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-                if (snapshot.hasData) {
-                  return snapshot.data;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Devices"),
+      ),
+      body: StreamBuilder(
+          stream: BLEAPI.instance.getBluetoothState(),
+          builder: (BuildContext context, AsyncSnapshot<BluetoothState> snapshot) {
+            if (snapshot.hasData && snapshot.data != BluetoothState.on) {
+              return _buildBluetoothStateScreen(context, snapshot.data);
+            }
+            else return FutureBuilder(
+              future: BLEAPI.instance.isConnected(),
+              initialData: false,
+              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                if (snapshot.hasData && snapshot.data) {
+                  return FutureBuilder<Widget> (
+                      future: _buildDeviceInfo(context),
+                      initialData: CircularProgressIndicator(),
+                      builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                        if (snapshot.hasData) {
+                          return snapshot.data;
+                        } else {
+                          return CircularProgressIndicator();
+                        }
+                      }
+                  );
                 } else {
-                  return CircularProgressIndicator();
+                  return _buildDeviceList(context);
                 }
-              }
-          );
-        } else {
-          return _buildDeviceList(context);
-        }
-      },
+              },
+            );
+          }
+      ),
     );
   }
 }

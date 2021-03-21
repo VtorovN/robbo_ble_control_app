@@ -62,4 +62,8 @@ class BLEAPI {
   }
 
   BluetoothDevice get connectedDevice => _connectedDevice;
+
+  Stream<BluetoothState> getBluetoothState() {
+    return _fb.state;
+  }
 }
