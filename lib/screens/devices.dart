@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:hive/hive.dart';
 
 class DevicesScreen extends StatefulWidget {
   static const routeName = '/devices';
@@ -10,7 +11,6 @@ class DevicesScreen extends StatefulWidget {
 }
 
 class _DevicesScreenState extends State<DevicesScreen> {
-
   Widget _buildBluetoothStateScreen(BuildContext context, BluetoothState bluetoothState) {
     return Scaffold(
       body: Center(
@@ -136,10 +136,12 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 color: Colors.black
               ),
             ),
-            RaisedButton(
+            ElevatedButton(
                 child: Text('DISCONNECT'),
-                color: Colors.red,
-                textColor: Colors.white,
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                  textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.white))
+                ),
                 onPressed: () async {
                   await BLEAPI.instance.disconnect();
                   setState(() {});
@@ -233,10 +235,12 @@ class _ScanResultTileState extends State<ScanResultTile> {
     if (connecting) {
       return CircularProgressIndicator();
     } else {
-      return RaisedButton(
+      return ElevatedButton(
         child: Text('CONNECT'),
-        color: Colors.black,
-        textColor: Colors.white,
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+            textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.white))
+        ),
         onPressed: () async {
           connecting = true;
           bool connectionSuccess = await onTap();
