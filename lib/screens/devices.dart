@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:hive/hive.dart';
+import 'package:ble_control_app/devices/database.dart';
 
 class DevicesScreen extends StatefulWidget {
   static const routeName = '/devices';
 
   @override
-  _DevicesScreenState createState() => _DevicesScreenState();
+  _DevicesScreenState createState() {
+    SavedDevicesDatabase.init();
+    return _DevicesScreenState();
+  }
 }
 
 class _DevicesScreenState extends State<DevicesScreen> {
@@ -51,7 +54,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                       onTap: () async {
                         bool connectionSuccess = await BLEAPI.instance.connect(r.device);
                         if (connectionSuccess) {
-                          Navigator.pop(context);
+                          setState(() {});
                         }
                         return connectionSuccess;
                       },
@@ -122,6 +125,9 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
 
   Future<Widget> _buildDeviceInfo(BuildContext context) async {
+    BluetoothDevice device = BLEAPI.instance.connectedDevice;
+    bool deviceSaved = await SavedDevicesDatabase.contains(device.id.id);
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -135,6 +141,23 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 fontSize: 20,
                 color: Colors.black
               ),
+            ),
+            ElevatedButton(
+                child: deviceSaved ? Text('DELETE') : Text('SAVE'),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                    textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.white))
+                ),
+                onPressed: () async {
+                  if (deviceSaved) {
+                    SavedDevicesDatabase.removeDeviceID(device.id.id);
+                  }
+                  else {
+                    SavedDevicesDatabase.addDeviceID(device.id.id);
+                  }
+
+                  setState(() {});
+                }
             ),
             ElevatedButton(
                 child: Text('DISCONNECT'),
@@ -172,12 +195,12 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 if (snapshot.hasData && snapshot.data) {
                   return FutureBuilder<Widget> (
                       future: _buildDeviceInfo(context),
-                      initialData: CircularProgressIndicator(),
+                      initialData: Center(child: CircularProgressIndicator()),
                       builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                         if (snapshot.hasData) {
                           return snapshot.data;
                         } else {
-                          return CircularProgressIndicator();
+                          return Center(child: CircularProgressIndicator());
                         }
                       }
                   );

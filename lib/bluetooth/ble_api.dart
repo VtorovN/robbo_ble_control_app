@@ -40,8 +40,7 @@ class BLEAPI {
   }
 
   Future<bool> isConnected() async {
-    List<BluetoothDevice> connectedDevices = await _fb.connectedDevices;
-    if(connectedDevices.contains(_connectedDevice)) {
+    if(await _connectedDevice.state.first == BluetoothDeviceState.connected) {
       return true;
     }
     else {
