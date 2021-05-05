@@ -3,6 +3,9 @@ import 'package:ble_control_app/bluetooth/ble_api.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:ble_control_app/devices/database.dart';
 
+const String SERVICE_UUID = "fe16f2b0-7783-11eb-9881-0800200c9a66";
+const String CHARACTERISTIC_UUID = "69869f60-7788-11eb-9881-0800200c9a66";
+
 class DevicesScreen extends StatefulWidget {
   static const routeName = '/devices';
 
@@ -14,7 +17,8 @@ class DevicesScreen extends StatefulWidget {
 }
 
 class _DevicesScreenState extends State<DevicesScreen> {
-  Widget _buildBluetoothStateScreen(BuildContext context, BluetoothState bluetoothState) {
+  Widget _buildBluetoothStateScreen(
+      BuildContext context, BluetoothState bluetoothState) {
     return Scaffold(
       body: Center(
         child: Column(
@@ -50,16 +54,17 @@ class _DevicesScreenState extends State<DevicesScreen> {
                   children: snapshot.data
                       .map(
                         (r) => ScanResultTile(
-                      result: r,
-                      onTap: () async {
-                        bool connectionSuccess = await BLEAPI.instance.connect(r.device);
-                        if (connectionSuccess) {
-                          setState(() {});
-                        }
-                        return connectionSuccess;
-                      },
-                    ),
-                  )
+                          result: r,
+                          onTap: () async {
+                            bool connectionSuccess =
+                                await BLEAPI.instance.connect(r.device);
+                            if (connectionSuccess) {
+                              setState(() {});
+                            }
+                            return connectionSuccess;
+                          },
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -99,27 +104,18 @@ class _DevicesScreenState extends State<DevicesScreen> {
           Text(
             device.name,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 24
-            ),
+            style: TextStyle(color: Colors.black, fontSize: 24),
           ),
           Text(
             device.id.toString(),
-            style: TextStyle(
-                color: Colors.grey,
-                fontSize: 15
-            ),
+            style: TextStyle(color: Colors.grey, fontSize: 15),
           )
         ],
       );
     } else {
       return Text(
         device.id.toString(),
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 24
-        ),
+        style: TextStyle(color: Colors.black, fontSize: 24),
       );
     }
   }
@@ -141,6 +137,19 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 fontSize: 20,
                 color: Colors.black
               ),
+            ),
+            ElevatedButton(
+                child: Text('BLINK'),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                    textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.black))
+                ),
+                onPressed: () async {
+                  List<BluetoothService> services = await BLEAPI.instance.getServices();
+                  BluetoothService service = services.firstWhere((service) => service.uuid.toString() == SERVICE_UUID);
+                  BluetoothCharacteristic characteristic = service.characteristics.firstWhere((characteristic) => characteristic.uuid.toString() == CHARACTERISTIC_UUID);
+                  characteristic.write([49]);
+                }
             ),
             ElevatedButton(
                 child: deviceSaved ? Text('DELETE') : Text('SAVE'),
@@ -184,33 +193,33 @@ class _DevicesScreenState extends State<DevicesScreen> {
       ),
       body: StreamBuilder(
           stream: BLEAPI.instance.getBluetoothState(),
-          builder: (BuildContext context, AsyncSnapshot<BluetoothState> snapshot) {
+          builder:
+              (BuildContext context, AsyncSnapshot<BluetoothState> snapshot) {
             if (snapshot.hasData && snapshot.data != BluetoothState.on) {
               return _buildBluetoothStateScreen(context, snapshot.data);
-            }
-            else return FutureBuilder(
-              future: BLEAPI.instance.isConnected(),
-              initialData: false,
-              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                if (snapshot.hasData && snapshot.data) {
-                  return FutureBuilder<Widget> (
-                      future: _buildDeviceInfo(context),
-                      initialData: Center(child: CircularProgressIndicator()),
-                      builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-                        if (snapshot.hasData) {
-                          return snapshot.data;
-                        } else {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                      }
-                  );
-                } else {
-                  return _buildDeviceList(context);
-                }
-              },
-            );
-          }
-      ),
+            } else
+              return FutureBuilder(
+                future: BLEAPI.instance.isConnected(),
+                initialData: false,
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  if (snapshot.hasData && snapshot.data) {
+                    return FutureBuilder<Widget>(
+                        future: _buildDeviceInfo(context),
+                        initialData: Center(child: CircularProgressIndicator()),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<Widget> snapshot) {
+                          if (snapshot.hasData) {
+                            return snapshot.data;
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        });
+                  } else {
+                    return _buildDeviceList(context);
+                  }
+                },
+              );
+          }),
     );
   }
 }
@@ -222,7 +231,8 @@ class ScanResultTile extends StatefulWidget {
   final Future<bool> Function() onTap;
 
   @override
-  _ScanResultTileState createState() => _ScanResultTileState(result: result, onTap: onTap);
+  _ScanResultTileState createState() =>
+      _ScanResultTileState(result: result, onTap: onTap);
 }
 
 class _ScanResultTileState extends State<ScanResultTile> {
@@ -262,8 +272,8 @@ class _ScanResultTileState extends State<ScanResultTile> {
         child: Text('CONNECT'),
         style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
-            textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.white))
-        ),
+            textStyle: MaterialStateProperty.all<TextStyle>(
+                TextStyle(color: Colors.white))),
         onPressed: () async {
           connecting = true;
           bool connectionSuccess = await onTap();
