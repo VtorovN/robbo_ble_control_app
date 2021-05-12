@@ -1,3 +1,4 @@
+import 'package:ble_control_app/devices/otto.dart';
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/screens/devices.dart';
 import 'package:ble_control_app/screens/scripts.dart';
@@ -45,37 +46,11 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: widget.title,
       ),
-      floatingActionButton: FloatingActionButtonsWidget(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: HomeActionButtons(),
       drawer: DrawerWidget()
     );
   }
-}
-
-class FloatingActionButtonsWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          FloatingActionButton(
-            onPressed: null,
-            child: Icon(Icons.audiotrack, color: Colors.white,),
-          ),
-          FloatingActionButton(
-            onPressed: null,
-            child: Icon(Icons.accessibility_new, color: Colors.white,),
-          ),
-          FloatingActionButton(
-            onPressed: null,
-            child: Icon(Icons.wb_incandescent_outlined, color: Colors.white,),
-          ),
-        ],
-      );
-  }
-
 }
 
 class DrawerWidget extends StatelessWidget {
@@ -133,11 +108,15 @@ class DrawerWidget extends StatelessWidget {
 }
 
 class HomeActionButtons extends StatefulWidget {
+  Otto otto = new Otto();
+
   @override
   State<StatefulWidget> createState() => new _HomeActionButtonsState();
 }
 
 class _HomeActionButtonsState extends State<HomeActionButtons> {
+  void method(){}
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -148,13 +127,13 @@ class _HomeActionButtonsState extends State<HomeActionButtons> {
             crossAxisCount: 3
           ),
         
-          children: <Widget> [ //TODO: Add Otto functions
-            ActiveButton("🦾", ),
-            ActiveButton("🦿", ),
-            ActiveButton("🔔", ),
-            ActiveButton("🟦", ),
-            ActiveButton("🟥", ),
-            ActiveButton("🟩", ),
+          children: <Widget> [
+            ActiveButton("🦾", method),
+            ActiveButton("🦿", method),
+            ActiveButton("🔔", method),
+            ActiveButton("R", widget.otto.blinkRed),
+            ActiveButton('G', widget.otto.blinkGreen),
+            ActiveButton("B", method),
           ],
         ),
     );
