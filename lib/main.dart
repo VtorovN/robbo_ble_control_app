@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:ble_control_app/devices/otto.dart';
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/screens/devices.dart';
 import 'package:ble_control_app/screens/scripts.dart';
@@ -137,11 +138,15 @@ class DrawerWidget extends StatelessWidget {
 }
 
 class HomeActionButtons extends StatefulWidget {
+  Otto otto = new Otto();
+
   @override
   State<StatefulWidget> createState() => new _HomeActionButtonsState();
 }
 
 class _HomeActionButtonsState extends State<HomeActionButtons> {
+  void method(){}
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -153,12 +158,12 @@ class _HomeActionButtonsState extends State<HomeActionButtons> {
           ),
         
           children: <Widget> [ //TODO: Add Otto functions
-            ActiveButton("🦾", ),
-            ActiveButton("🦿", ),
-            ActiveButton("🔔", ),
-            ActiveButton("🟦", ),
-            ActiveButton("🟥", ),
-            ActiveButton("🟩", ),
+            ActiveButton("🦾", method),
+            ActiveButton("🦿", method),
+            ActiveButton("🔔", method),
+            ActiveButton("🟦", method),
+            ActiveButton("RED", widget.otto.blinkRed),
+            ActiveButton("GREEN", widget.otto.blinkGreen),
           ],
         ),
     );

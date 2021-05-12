@@ -5,12 +5,13 @@ class Otto {
   BluetoothService _service;
 
   final String _serviceUUID = "fe16f2b0-7783-11eb-9881-0800200c9a66";
-  final String _blinkUUID = "69869f60-7788-11eb-9881-0800200c9a66";
+  final String _blinkRedUUID = "69869f60-7788-11eb-9881-0800200c9a66";
+  final String _blinkGreenUUID = "baa67b3a-b32a-11eb-8529-0242ac130003";
 
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
   Otto() {
-    savedCharacteristics = { _blinkUUID : null };
+    savedCharacteristics = { _blinkRedUUID : null, _blinkGreenUUID : null};
   }
 
   Future _initService() async {
@@ -31,8 +32,13 @@ class Otto {
         _service.characteristics.firstWhere((characteristic) => characteristic.uuid.toString() == id);
   }
 
-  void blink() async {
-    BluetoothCharacteristic characteristic = await getCharacteristicByID(_blinkUUID);
+  void blinkRed() async {
+    BluetoothCharacteristic characteristic = await getCharacteristicByID(_blinkRedUUID);
+    characteristic.write([49]);
+  }
+
+  void blinkGreen() async {
+    BluetoothCharacteristic characteristic = await getCharacteristicByID(_blinkGreenUUID);
     characteristic.write([49]);
   }
 }
