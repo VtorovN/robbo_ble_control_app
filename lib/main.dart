@@ -1,12 +1,8 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/screens/devices.dart';
 import 'package:ble_control_app/screens/scripts.dart';
 import 'package:ble_control_app/screens/settings.dart';
 import 'package:ble_control_app/screens/about.dart';
-
-const double margin = 8.0;
 
 void main() {
   runApp(MyApp());
@@ -182,7 +178,7 @@ class _ActiveButtonState extends State<ActiveButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-              margin: EdgeInsets.all(margin),
+              margin: EdgeInsets.all(CommonValues.margin),
               child: ElevatedButton(
                 onPressed: () { _pressButton(); },
                 style: ElevatedButton.styleFrom(
@@ -199,6 +195,7 @@ class _ActiveButtonState extends State<ActiveButton> {
 
 
 class CommonValues {
-  static TextStyle drawerDefaultTextStyle = TextStyle(fontSize: 20);
-  static TextStyle drawerBlockedTextStyle = TextStyle(fontSize: 20, decoration: TextDecoration.lineThrough, color: Colors.black.withOpacity(0.5));
+  static final double margin = 8.0;
+  static final TextStyle drawerDefaultTextStyle = TextStyle(fontSize: 20);
+  static final TextStyle drawerBlockedTextStyle = TextStyle(fontSize: 20, decoration: TextDecoration.lineThrough, color: Colors.black.withOpacity(0.5));
 }
