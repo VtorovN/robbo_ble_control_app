@@ -152,13 +152,13 @@ class _HomeActionButtonsState extends State<HomeActionButtons> {
             crossAxisCount: 3
           ),
         
-          children: <Widget> [
-            ActiveButton("🦾"),
-            ActiveButton("🦿"),
-            ActiveButton("🔔"),
-            ActiveButton("🟦"),
-            ActiveButton("🟥"),
-            ActiveButton("🟩"),
+          children: <Widget> [ //TODO: Add Otto functions
+            ActiveButton("🦾", ),
+            ActiveButton("🦿", ),
+            ActiveButton("🔔", ),
+            ActiveButton("🟦", ),
+            ActiveButton("🟥", ),
+            ActiveButton("🟩", ),
           ],
         ),
     );
@@ -166,24 +166,17 @@ class _HomeActionButtonsState extends State<HomeActionButtons> {
 }
 
 class ActiveButton extends StatefulWidget {
-  String _text; 
-  ActiveButton(this._text);
+  final String _text; 
+  final Function _onPressed;
+  ActiveButton(this._text, this._onPressed);
 
   @override 
   _ActiveButtonState createState() => new _ActiveButtonState();
 }
 
 class _ActiveButtonState extends State<ActiveButton> {
-  // bool _isPressed = false;
-  // Command _command;
-
   void _pressButton() {
-    setState(() {
-      // if (_isPressed) {
-      //   _command.run();
-      // }
-      // _isPressed = !_isPressed;
-    });
+    widget._onPressed();
   }
 
   @override
@@ -196,8 +189,6 @@ class _ActiveButtonState extends State<ActiveButton> {
                   shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(15.0),
                   ),
-                  // side: BorderSide(width: 2.0, color: Colors.black),
-                  // primary: _isPressed ? Colors.green.shade300 : Colors.blue.shade200
                   primary: Colors.green.shade300
                 ),
                 child: Text(widget._text, style: TextStyle(fontSize: 40))

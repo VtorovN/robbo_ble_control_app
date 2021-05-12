@@ -189,7 +189,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Devices"),
+        title: Text("Devices", style: TextStyle(fontSize: 20)),
       ),
       body: StreamBuilder(
           stream: BLEAPI.instance.getBluetoothState(),
