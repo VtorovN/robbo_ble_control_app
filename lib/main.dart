@@ -128,15 +128,12 @@ class _HomeActionButtonsState extends State<HomeActionButtons> {
           ),
         
           children: <Widget> [
-            ActiveButton("🦾", method),
-            ActiveButton("🔔", method),
-            ActiveButton("🦿", method),
             ActiveButton("R", widget.otto.blinkRed),
             ActiveButton('G', widget.otto.blinkGreen),
-            ActiveButton("B", method),
-            ActiveButton("cmd", method),
-            ActiveButton("cmd", method),
-            ActiveButton("cmd", method),
+            ActiveButton("B", widget.otto.blinkBlue),
+            ActiveButton("0", () => widget.otto.rotateServo(0)),
+            ActiveButton("90", () => widget.otto.rotateServo(90)),
+            ActiveButton("180", () => widget.otto.rotateServo(180)),
           ],
         ),
     );
