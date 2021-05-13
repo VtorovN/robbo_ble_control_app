@@ -129,11 +129,14 @@ class _HomeActionButtonsState extends State<HomeActionButtons> {
         
           children: <Widget> [
             ActiveButton("🦾", method),
-            ActiveButton("🦿", method),
             ActiveButton("🔔", method),
+            ActiveButton("🦿", method),
             ActiveButton("R", widget.otto.blinkRed),
             ActiveButton('G', widget.otto.blinkGreen),
             ActiveButton("B", method),
+            ActiveButton("cmd", method),
+            ActiveButton("cmd", method),
+            ActiveButton("cmd", method),
           ],
         ),
     );
@@ -166,8 +169,8 @@ class _ActiveButtonState extends State<ActiveButton> {
                   ),
                   primary: Colors.green.shade300
                 ),
-                child: Text(widget._text, style: TextStyle(fontSize: 40))
-              ),
+                child: Text(widget._text, style: TextStyle(fontSize: 35))
+              ), 
             );
   }
 }
