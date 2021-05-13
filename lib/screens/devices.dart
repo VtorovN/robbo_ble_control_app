@@ -138,36 +138,23 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 color: Colors.black
               ),
             ),
-            ElevatedButton(
-                child: Text('BLINK'),
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                    textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.black))
-                ),
-                onPressed: () async {
-                  List<BluetoothService> services = await BLEAPI.instance.getServices();
-                  BluetoothService service = services.firstWhere((service) => service.uuid.toString() == SERVICE_UUID);
-                  BluetoothCharacteristic characteristic = service.characteristics.firstWhere((characteristic) => characteristic.uuid.toString() == CHARACTERISTIC_UUID);
-                  characteristic.write([49]);
-                }
-            ),
-            ElevatedButton(
-                child: deviceSaved ? Text('DELETE') : Text('SAVE'),
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
-                    textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.white))
-                ),
-                onPressed: () async {
-                  if (deviceSaved) {
-                    SavedDevicesDatabase.removeDeviceID(device.id.id);
-                  }
-                  else {
-                    SavedDevicesDatabase.addDeviceID(device.id.id);
-                  }
-
-                  setState(() {});
-                }
-            ),
+            // ElevatedButton(
+            //     child: deviceSaved ? Text('DELETE') : Text('SAVE'),
+            //     style: ButtonStyle(
+            //         backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+            //         textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.white))
+            //     ),
+            //     onPressed: () async {
+            //       if (deviceSaved) {
+            //         SavedDevicesDatabase.removeDeviceID(device.id.id);
+            //       }
+            //       else {
+            //         SavedDevicesDatabase.addDeviceID(device.id.id);
+            //       }
+            //
+            //       setState(() {});
+            //     }
+            // ),
             ElevatedButton(
                 child: Text('DISCONNECT'),
                 style: ButtonStyle(
