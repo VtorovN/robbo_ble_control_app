@@ -3,9 +3,6 @@ import 'package:ble_control_app/bluetooth/ble_api.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:ble_control_app/devices/database.dart';
 
-const String SERVICE_UUID = "fe16f2b0-7783-11eb-9881-0800200c9a66";
-const String CHARACTERISTIC_UUID = "69869f60-7788-11eb-9881-0800200c9a66";
-
 class DevicesScreen extends StatefulWidget {
   static const routeName = '/devices';
 
@@ -122,7 +119,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   Future<Widget> _buildDeviceInfo(BuildContext context) async {
     BluetoothDevice device = BLEAPI.instance.connectedDevice;
-    bool deviceSaved = await SavedDevicesDatabase.contains(device.id.id);
+    //bool deviceSaved = await SavedDevicesDatabase.contains(device.id.id);
 
     return Scaffold(
       body: Center(
