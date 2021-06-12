@@ -13,7 +13,12 @@ class Otto {
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
   Otto() {
-    savedCharacteristics = { _blinkRedUUID : null, _blinkGreenUUID : null};
+    savedCharacteristics = {
+      _blinkRedUUID : null,
+      _blinkGreenUUID : null,
+      _blinkBlueUUID : null,
+      _rotateServoUUID : null
+    };
   }
 
   Future _initService() async {
