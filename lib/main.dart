@@ -1,9 +1,14 @@
 import 'package:ble_control_app/devices/otto.dart';
+import 'package:ble_control_app/model/action.dart';
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/screens/devices.dart';
 import 'package:ble_control_app/screens/scripts.dart';
 import 'package:ble_control_app/screens/settings.dart';
 import 'package:ble_control_app/screens/about.dart';
+
+import 'model/utils.dart';
+
+final Otto otto = new Otto(); // TODO: куда деть? Нужен вроде везде общий
 
 void main() {
   runApp(MyApp());
@@ -50,17 +55,18 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: widget.title,
           actions: [
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                widget._homeActionsButtonsKey.currentState
-                    .addGridElementAt(0, "T", () {});
-              },
+            Builder(
+              builder: (context) => IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () => Scaffold.of(context).openEndDrawer(),
+              ),
             ),
           ],
         ),
         body: HomeActionButtons(widget._homeActionsButtonsKey),
-        drawer: DrawerWidget());
+        drawer: DrawerWidget(),
+        endDrawer: EndDrawerWidget(widget),
+        );
   }
 }
 
@@ -122,8 +128,77 @@ class DrawerWidget extends StatelessWidget {
   }
 }
 
+class EndDrawerWidget extends StatelessWidget {
+
+  MyHomePage _homePage;
+  EndDrawerWidget(this._homePage);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          Container(
+            height: 150, // TODO: constraints
+            child: DrawerHeader(
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Text('Add action',
+                    style: TextStyle(fontSize: 30, color: Colors.white)),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.lightGreen,
+              ),
+            ),
+          ),
+
+
+          otto.action(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Action", () {}); }),
+          otto.blink(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Blink", () {}); }),
+          otto.move(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Move", () {}); }),
+          otto.sound(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Ough", () {}); }),
+
+          // ListTile(
+          //   title: Text(
+          //     'Blink',
+          //     style: CommonValues.drawerDefaultTextStyle,
+          //   ),
+          //   leading: Icon(Icons.lightbulb),
+          //   onTap: () {
+          //     _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Blink", () {});
+          //      Navigator.pop(context);
+          //   },
+          // ),
+          // ListTile(
+          //   title: Text(
+          //     'Move',
+          //     style: CommonValues.drawerDefaultTextStyle,
+          //   ),
+          //   leading: Icon(Icons.accessibility),
+          //   onTap: () {
+          //     _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Move", () {});
+          //      Navigator.pop(context);
+          //   },
+          // ),
+          // ListTile(
+          //   title: Text(
+          //     'Sound',
+          //     style: CommonValues.drawerDefaultTextStyle,
+          //   ),
+          //   leading: Icon(Icons.audiotrack),
+          //   onTap: () {
+          //     _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Ough", () {});
+          //      Navigator.pop(context);
+          //   },
+          // ),
+        ],
+      ),
+    );
+  }
+}
+
 class HomeActionButtons extends StatefulWidget {
-  final Otto otto = new Otto();
   final GlobalKey<_HomeActionButtonsState> key;
 
   HomeActionButtons(this.key) : super(key: key);
@@ -262,7 +337,7 @@ class _DraggableButtonState extends State<DraggableButton> {
                 child: Center(
                   child: Text(
                     widget._text,
-                    style: TextStyle(color: Colors.white, fontSize: 35),
+                    style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ),
               ),
@@ -276,17 +351,8 @@ class _DraggableButtonState extends State<DraggableButton> {
                   borderRadius: new BorderRadius.circular(15.0),
                 ),
                 primary: Colors.green.shade300),
-            child: Text(widget._text, style: TextStyle(fontSize: 35))),
+            child: Text(widget._text, style: TextStyle(fontSize: 25))),
       );
     });
   }
-}
-
-class CommonValues {
-  static final double margin = 8.0;
-  static final TextStyle drawerDefaultTextStyle = TextStyle(fontSize: 20);
-  static final TextStyle drawerBlockedTextStyle = TextStyle(
-      fontSize: 20,
-      decoration: TextDecoration.lineThrough,
-      color: Colors.black.withOpacity(0.5));
 }

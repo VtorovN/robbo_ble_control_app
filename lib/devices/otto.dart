@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:ble_control_app/model/action.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
 
@@ -58,5 +62,21 @@ class Otto {
     String degreesCode = degrees.toString();
     BluetoothCharacteristic characteristic = await getCharacteristicByID(_rotateServoUUID);
     characteristic.write(degreesCode.codeUnits);
+  }
+
+  Widget action(Function creationFunc) {
+    return BaseActionWidget(BaseAction(creationFunc, () {},  "Action", Icon(Icons.create)));
+  }
+
+  Widget move(Function creationFunc) {
+    return BaseActionWidget(BaseAction(creationFunc, () {},  "Move", Icon(Icons.accessibility)));
+  }
+
+  Widget sound(Function creationFunc) {
+    return BaseActionWidget(BaseAction(creationFunc, () {},  "Ough", Icon(Icons.audiotrack)));
+  }
+
+  Widget blink(Function creationFunc) {
+    return BaseActionWidget(BaseAction(creationFunc, () {},  "Blink", Icon(Icons.lightbulb)));
   }
 }
