@@ -153,45 +153,10 @@ class EndDrawerWidget extends StatelessWidget {
             ),
           ),
 
-
-          otto.action(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Action", () {}); }),
-          otto.blink(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Blink", () {}); }),
-          otto.move(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Move", () {}); }),
-          otto.sound(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Ough", () {}); }),
-
-          // ListTile(
-          //   title: Text(
-          //     'Blink',
-          //     style: CommonValues.drawerDefaultTextStyle,
-          //   ),
-          //   leading: Icon(Icons.lightbulb),
-          //   onTap: () {
-          //     _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Blink", () {});
-          //      Navigator.pop(context);
-          //   },
-          // ),
-          // ListTile(
-          //   title: Text(
-          //     'Move',
-          //     style: CommonValues.drawerDefaultTextStyle,
-          //   ),
-          //   leading: Icon(Icons.accessibility),
-          //   onTap: () {
-          //     _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Move", () {});
-          //      Navigator.pop(context);
-          //   },
-          // ),
-          // ListTile(
-          //   title: Text(
-          //     'Sound',
-          //     style: CommonValues.drawerDefaultTextStyle,
-          //   ),
-          //   leading: Icon(Icons.audiotrack),
-          //   onTap: () {
-          //     _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, "Ough", () {});
-          //      Navigator.pop(context);
-          //   },
-          // ),
+          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.action);}, otto.action),
+          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.blink);}, otto.blink),
+          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.move);}, otto.move),
+          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.sound);}, otto.sound),
         ],
       ),
     );
@@ -211,12 +176,12 @@ class _HomeActionButtonsState extends State<HomeActionButtons> {
   List<GridViewElementWithDraggableData> _gridViewChildren;
   final int _gridSize = 12;
 
-  void addGridElementAt(int position, String text, Function onPressed) {
+  void addGridElementAt(int position, BaseAction action) {
     if (position < 0 || position >= _gridSize) {
       throw ("Position is out of range");
     }
 
-    _gridViewChildren[position].key.currentState.buildButton(text, onPressed);
+    _gridViewChildren[position].key.currentState.buildButton(action);
   }
 
   @override
@@ -278,7 +243,7 @@ class _GridViewElementWithDraggableDataState
             onAccept: (button) {
               setState(() {
                 _button =
-                    DraggableButton(button.text, button.onPressed, resetButton);
+                    DraggableButton(button.action, resetButton);
               });
             },
           );
@@ -290,22 +255,20 @@ class _GridViewElementWithDraggableDataState
     });
   }
 
-  void buildButton(String text, Function onPressed) {
+  void buildButton(BaseAction action) {
     setState(() {
-      _button = DraggableButton(text, onPressed, resetButton);
+      _button = DraggableButton(action, resetButton);
     });
   }
 }
 
 class DraggableButton extends StatefulWidget {
-  final String _text;
-  final Function _onPressed;
+  final BaseAction _action;
   final Function _resetFunction;
 
-  String get text => _text;
-  Function get onPressed => _onPressed;
+  BaseAction get action => this._action;
 
-  DraggableButton(this._text, this._onPressed, this._resetFunction);
+  DraggableButton(this._action, this._resetFunction);
 
   @override
   _DraggableButtonState createState() => new _DraggableButtonState();
@@ -336,7 +299,7 @@ class _DraggableButtonState extends State<DraggableButton> {
                 ),
                 child: Center(
                   child: Text(
-                    widget._text,
+                    widget.action.title,
                     style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ),
@@ -345,13 +308,13 @@ class _DraggableButtonState extends State<DraggableButton> {
           ),
         ),
         child: ElevatedButton(
-            onPressed: widget._onPressed,
+            onPressed: widget.action.onPressed,
             style: ElevatedButton.styleFrom(
                 shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(15.0),
                 ),
                 primary: Colors.green.shade300),
-            child: Text(widget._text, style: TextStyle(fontSize: 25))),
+            child: Text(widget.action.title, style: TextStyle(fontSize: 25))),
       );
     });
   }

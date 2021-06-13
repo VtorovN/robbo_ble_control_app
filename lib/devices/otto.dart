@@ -16,6 +16,11 @@ class Otto {
 
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
+  BaseAction _action = BaseAction("Action", Icon(Icons.create));
+  BaseAction _move = BaseAction("Move", Icon(Icons.accessibility));
+  BaseAction _sound = BaseAction("Sound", Icon(Icons.audiotrack));
+  BaseAction _blink = BaseAction("Blink", Icon(Icons.lightbulb));
+
   Otto() {
     savedCharacteristics = {
       _blinkRedUUID : null,
@@ -64,19 +69,14 @@ class Otto {
     characteristic.write(degreesCode.codeUnits);
   }
 
-  Widget action(Function creationFunc) {
-    return BaseActionWidget(BaseAction(creationFunc, () {},  "Action", Icon(Icons.create)));
+  Widget doAction(Function creationFunc, BaseAction baseAction) {
+    baseAction.creatingFunc = creationFunc; //TODO: Проверить Отто ли это
+    baseAction.onPressed = () {};
+    return BaseActionWidget(baseAction);
   }
 
-  Widget move(Function creationFunc) {
-    return BaseActionWidget(BaseAction(creationFunc, () {},  "Move", Icon(Icons.accessibility)));
-  }
-
-  Widget sound(Function creationFunc) {
-    return BaseActionWidget(BaseAction(creationFunc, () {},  "Ough", Icon(Icons.audiotrack)));
-  }
-
-  Widget blink(Function creationFunc) {
-    return BaseActionWidget(BaseAction(creationFunc, () {},  "Blink", Icon(Icons.lightbulb)));
-  }
+  get action => this._action;
+  get move => this._move;
+  get sound => this._sound;
+  get blink => this._blink;
 }

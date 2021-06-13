@@ -18,7 +18,7 @@ class BaseAction {
   String _title;
   Size _size;
   Icon _icon;
-  BaseAction(this._creatingFunc, this._onPressed, this._title, this._icon);
+  BaseAction(this._title, this._icon);
 
   void create() {
     _creatingFunc();
@@ -28,41 +28,26 @@ class BaseAction {
     _onPressed();
   }
 
-  Icon get icon => _icon;
-
-  set icon(Icon value) {
-    _icon = value;
-  }
-
-  Size get size => _size;
-
-  set size(Size value) {
-    _size = value;
-  }
-
-  String get title => _title;
-
-  set title(String value) {
-    _title = value;
-  }
-
-  Pin get pin => _pin;
-
-  set pin(Pin value) {
-    _pin = value;
-  }
-
-  bool get mode => _mode;
-
-  set mode(bool value) {
-    _mode = value;
-  }
+  Function get creatingFunc => this._creatingFunc;
+  set creatingFunc(Function value) => this._creatingFunc = value;
 
   Function get onPressed => _onPressed;
+  set onPressed(Function value) => this._onPressed = value;
 
-  set onPressed(Function value) {
-    _onPressed = value;
-  }
+  Pin get pin => this._pin;
+  set pin(Pin value) => this._pin = value;
+
+  get title => this._title;
+  set title( value) => this._title = value;
+
+  get size => this._size;
+  set size( value) => this._size = value;
+
+  get icon => this._icon;
+  set icon( value) => this._icon = value;
+
+  bool get mode => _mode;
+  set mode(bool value) => this._mode = value;
 }
 
 class BaseActionWidget extends StatefulWidget {
