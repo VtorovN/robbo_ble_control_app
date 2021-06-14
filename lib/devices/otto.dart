@@ -8,7 +8,10 @@ import 'package:ble_control_app/bluetooth/ble_api.dart';
 class Otto {
   BluetoothService _service;
 
+// Blink(UUID, UUID)
+
   final String _serviceUUID = "fe16f2b0-7783-11eb-9881-0800200c9a66";
+
   final String _blinkRedUUID = "69869f60-7788-11eb-9881-0800200c9a66";
   final String _blinkGreenUUID = "baa67b3a-b32a-11eb-8529-0242ac130003";
   final String _blinkBlueUUID = "788b23f8-b3e4-11eb-8529-0242ac130003";
@@ -67,12 +70,6 @@ class Otto {
     String degreesCode = degrees.toString();
     BluetoothCharacteristic characteristic = await getCharacteristicByID(_rotateServoUUID);
     characteristic.write(degreesCode.codeUnits);
-  }
-
-  Widget doAction(Function creationFunc, BaseAction baseAction) {
-    baseAction.creatingFunc = creationFunc; //TODO: Проверить Отто ли это
-    baseAction.onPressed = () {};
-    return BaseActionWidget(baseAction);
   }
 
   get action => this._action;

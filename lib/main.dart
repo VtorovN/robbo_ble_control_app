@@ -1,5 +1,6 @@
 import 'package:ble_control_app/devices/otto.dart';
 import 'package:ble_control_app/model/action.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/screens/devices.dart';
 import 'package:ble_control_app/screens/scripts.dart';
@@ -9,6 +10,7 @@ import 'package:ble_control_app/screens/about.dart';
 import 'model/utils.dart';
 
 final Otto otto = new Otto(); // TODO: куда деть? Нужен вроде везде общий
+bool isEditing = false;
 
 void main() {
   runApp(MyApp());
@@ -45,8 +47,10 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => myHomePageState;
 }
+
+final myHomePageState = _MyHomePageState();
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
@@ -55,6 +59,17 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: widget.title,
           actions: [
+            Builder( // Edit Button
+              builder: (context) => IconButton(
+                icon: Icon(Icons.edit),
+                color: isEditing ? Colors.deepOrange : Colors.white,
+                onPressed: () {
+                  setState(() {
+                    isEditing = !isEditing;
+                  });
+                } 
+              ),
+            ),
             Builder(
               builder: (context) => IconButton(
                 icon: Icon(Icons.add),
@@ -153,10 +168,10 @@ class EndDrawerWidget extends StatelessWidget {
             ),
           ),
 
-          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.action);}, otto.action),
-          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.blink);}, otto.blink),
-          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.move);}, otto.move),
-          otto.doAction(() { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.sound);}, otto.sound),
+          BaseActionWidget(otto.action, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.action);}),
+          BaseActionWidget(otto.blink, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.blink);}),
+          BaseActionWidget(otto.move, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.move);}),
+          BaseActionWidget(otto.sound, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.sound);}),
         ],
       ),
     );
@@ -266,9 +281,11 @@ class DraggableButton extends StatefulWidget {
   final BaseAction _action;
   final Function _resetFunction;
 
-  BaseAction get action => this._action;
+  final key = GlobalKey<_DraggableButtonState>();
 
   DraggableButton(this._action, this._resetFunction);
+
+  BaseAction get action => this._action;
 
   @override
   _DraggableButtonState createState() => new _DraggableButtonState();
@@ -308,7 +325,13 @@ class _DraggableButtonState extends State<DraggableButton> {
           ),
         ),
         child: ElevatedButton(
-            onPressed: widget.action.onPressed,
+            onPressed: () {
+              if (isEditing) {
+                showBottomSheet(context: context, builder: (context) => EditingBottomSheet(widget.action, widget.key));
+              } else {
+                widget.action.onPressed();
+              }
+            },
             style: ElevatedButton.styleFrom(
                 shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(15.0),
@@ -317,5 +340,141 @@ class _DraggableButtonState extends State<DraggableButton> {
             child: Text(widget.action.title, style: TextStyle(fontSize: 25))),
       );
     });
+  }
+}
+
+class EditingBottomSheet extends StatefulWidget { //TODO: Работать с копией и сохранять на Save (copyWith())
+  BaseAction _action;
+  GlobalKey<_DraggableButtonState> _draggableButtonState;
+  
+  EditingBottomSheet(this._action, this._draggableButtonState);
+
+  @override
+  _EditingBottomSheetState createState() => _EditingBottomSheetState();
+}
+
+class _EditingBottomSheetState extends State<EditingBottomSheet> {
+  void _updateState(Function foo) {
+    setState(() {
+      widget._draggableButtonState.currentState.setState(() {
+        foo();  
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.5,
+      padding: const EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.green, width: 2.0),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: 40,
+            child: ListTile(title: Text("\"" + widget._action.title + "\" Settings", style: CommonValues.bottomSheetTitleTextStyle,)),
+          ),
+          // Divider(),
+
+          Container(
+            height: 100,
+            child: TextFormField( // Change Name
+              style: TextStyle(fontSize: 20),
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.edit, color: Colors.black38),
+                border: UnderlineInputBorder(),
+                labelText: "Edit name",
+                labelStyle: TextStyle(color: Colors.black38)
+              ),
+              maxLength: 30,
+              initialValue: widget._action.title,
+              onChanged: (text) {
+                _updateState(() { widget._action.title = text; });
+              },
+            ),
+          ),
+          // Divider(),
+
+          Container(
+            height: 100,
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text("switch", style: CommonValues.bottomSheetSwitchTextStyle,),
+                Transform.scale(
+                  scale: 1.7,
+                  child: Switch(
+                      value: widget._action.mode, 
+                      onChanged: (bool value) {
+                          setState(() { widget._action.mode = value; });
+                      },
+                  ),
+                ),
+                Text("hold", style: CommonValues.bottomSheetSwitchTextStyle,),
+              ],
+            ),
+          ),
+          // Divider(),
+          
+          Container(
+            padding: EdgeInsets.all(8),
+            height: 45,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text("Pin", style: CommonValues.bottomSheetTextStyle,),
+
+                SliderTheme(data: SliderThemeData(
+                  trackShape: RectangularSliderTrackShape(),
+                  trackHeight: 4.0,
+                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                  overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+                ), 
+                child: 
+                Container (
+                  width: 320,
+                  child: Slider(
+                    min: 1,
+                    max: 32,
+                    divisions: 31,
+                    label: widget._action.pin.toString(),
+                    value: widget._action.pin,
+                    onChanged: (value) {
+                      setState(() {
+                        widget._action.pin = value;
+                      });
+                    },
+                  ),)
+                )
+              ],
+            ),
+          ),
+          // Divider(),
+
+          Container(
+            height: 100,
+            alignment: Alignment.bottomRight,
+            child: ElevatedButton.icon(
+              icon: Icon(Icons.done, size: 20),
+              label: Text('Done', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
+                ),
+              ),
+              onPressed: () {
+                myHomePageState.setState(() { isEditing = false; });
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          // Divider(),
+        ],
+      ),
+    );
   }
 }
