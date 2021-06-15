@@ -318,34 +318,36 @@ class _DraggableButtonState extends State<DraggableButton> {
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(15.0),
                 ),
-                child: Center(
-                  child: Text(
-                    widget.action.title,
-                    style: TextStyle(color: Colors.white, fontSize: 25),
-                  ),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: 
+                    AutoSizeText(widget.action.title, textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 25), 
+                      maxLines: 2, overflow: TextOverflow.clip,)
                 ),
               ),
             ),
           ),
         ),
         child: ElevatedButton(
-            onPressed: () {
-              if (isEditing) {
-                showModalBottomSheet(
-                  context: context, 
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)), 
-                  builder: (context) => EditingModalBottomSheet(widget.action, widget.key));
-              } else {
-                widget.action.onPressed();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(15.0),
-                ),
-                primary: Colors.green.shade300),
-            child: 
-              AutoSizeText(widget.action.title, textAlign: TextAlign.center, style: TextStyle(fontSize: 25), maxLines: 2, overflow: TextOverflow.clip,)
+          onPressed: () {
+            if (isEditing) {
+              showModalBottomSheet(
+                context: context, 
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)), 
+                builder: (context) => EditingModalBottomSheet(widget.action, widget.key));
+            } else {
+              widget.action.onPressed();
+            }
+          },
+          style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              primary: Colors.green.shade300),
+          child: 
+            AutoSizeText(widget.action.title, textAlign: TextAlign.center, style: TextStyle(fontSize: 25), maxLines: 2, overflow: TextOverflow.clip,)
           ),
       );
     });
