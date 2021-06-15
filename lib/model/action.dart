@@ -11,17 +11,30 @@ class Pin {
 
 }
 
+class ButtonSize {
+  double _height;
+  double _width;
+
+  ButtonSize(this._width, this._height);
+
+  get height => this._height;
+  set height(double value) => this._height = value;
+
+  get width => this._width;
+  set width( value) => this._width = value;
+}
+
 class BaseAction {
   String _title;
   Icon _icon;
 
-  Size _size;
+  ButtonSize _size;
   Function _onPressed;
   bool _mode; // High-Low
   double _pin;
   
   BaseAction(this._title, this._icon) {
-    _size = Size(1, 1);
+    _size = ButtonSize(1, 1);
     _onPressed = () {};
     _mode = false;
     _pin = 1;
@@ -42,6 +55,12 @@ class BaseAction {
 
   get size => this._size;
   set size( value) => this._size = value;
+
+  get width => this._size.width;
+  set width( value) => this._size.width = value;
+
+  get height => this._size.height;
+  set height( value) => this._size.height = value;
 
   get icon => this._icon;
   set icon( value) => this._icon = value;

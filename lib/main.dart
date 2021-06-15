@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ble_control_app/devices/otto.dart';
 import 'package:ble_control_app/model/action.dart';
@@ -350,9 +352,9 @@ class _DraggableButtonState extends State<DraggableButton> {
   }
 }
 
-class EditingModalBottomSheet extends StatefulWidget { //TODO: Работать с копией и сохранять на Save (copyWith())
+class EditingModalBottomSheet extends StatefulWidget { //TODO: Работать с копией и сохранять на Done (copyWith())
   BaseAction _action;
-  GlobalKey<_DraggableButtonState> _draggableButtonState;
+  final GlobalKey<_DraggableButtonState> _draggableButtonState;
   
   EditingModalBottomSheet(this._action, this._draggableButtonState);
 
@@ -369,9 +371,28 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
     });
   }
 
+  Widget _sizeDropDownButton(bool axis, double dropdownValue) {
+    return DropdownButton<double>(
+      value: dropdownValue,
+      underline: Container(
+        height: 1,
+      ),
+      onChanged: (double newValue) {
+        _updateState(() => axis? widget._action.width = newValue : widget._action.height = newValue);
+      },
+      items: <double>[1, 2, 3].map<DropdownMenuItem<double>>((double value) {
+        return DropdownMenuItem<double>(
+          value: value,
+          child: Text(value.toString(), style: TextStyle(fontSize: 18),),
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double bottomSheetHeight = MediaQuery.of(context).size.height * 0.6;
+
     return Container(
       height: bottomSheetHeight,
       padding: const EdgeInsets.all(6.0),
@@ -462,8 +483,22 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
               ),
             ),
 
+            
+            Container( // SizeChanger
+            height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("width:", style: CommonValues.bottomSheetTextStyle,),
+                  _sizeDropDownButton(true, widget._action.width),
+                  Text("height:", style: CommonValues.bottomSheetTextStyle,),
+                  _sizeDropDownButton(false, widget._action.height)
+                ],
+              ),
+            ),
+
             Container(
-              height: 100,
+              height: 80,
               alignment: Alignment.bottomRight,
               padding: EdgeInsets.only(right: 15),
               child: ElevatedButton.icon(
