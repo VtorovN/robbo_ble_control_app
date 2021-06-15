@@ -404,15 +404,15 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
         child: ListView(
           
           children: <Widget>[
-            Container(
+            Container( // Title
               height: 45,
               child: ListTile(title: AutoSizeText("\"" + widget._action.title + "\" settings", style: CommonValues.bottomSheetTitleTextStyle, maxLines: 1,)),
             ),
 
-            Container(
+            Container( // Change Name
               height: 100,
               padding: EdgeInsets.only(right: 15),
-              child: TextFormField( // Change Name
+              child: TextFormField( 
                 style: TextStyle(fontSize: 20),
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.edit, color: Colors.black38),
@@ -428,7 +428,7 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
               ),
             ),
 
-            Container(
+            Container( // Mode Switch
               height: bottomSheetHeight * 0.25,
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: MediaQuery.of(context).size.width * 0.1),
               child: Row(
@@ -449,7 +449,7 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
               ),
             ),
             
-            Container(
+            Container( // Pin Slider
               padding: EdgeInsets.all(2),
               height: 45,
               child: Row(
@@ -497,7 +497,7 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
               ),
             ),
 
-            Container(
+            Container( // Done Button
               height: 80,
               alignment: Alignment.bottomRight,
               padding: EdgeInsets.only(right: 15),

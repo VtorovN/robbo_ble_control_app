@@ -8,8 +8,6 @@ import 'package:ble_control_app/bluetooth/ble_api.dart';
 class Otto {
   BluetoothService _service;
 
-// Blink(UUID, UUID)
-
   final String _serviceUUID = "fe16f2b0-7783-11eb-9881-0800200c9a66";
 
   final String _blinkRedUUID = "69869f60-7788-11eb-9881-0800200c9a66";
@@ -23,8 +21,6 @@ class Otto {
   BaseAction move() => BaseAction("Move", Icon(Icons.accessibility));
   BaseAction sound () => BaseAction("Sound", Icon(Icons.audiotrack));
   BaseAction blink ()=> BaseAction("Blink", Icon(Icons.lightbulb));
-
-
 
   Otto() {
     savedCharacteristics = {
@@ -73,9 +69,4 @@ class Otto {
     BluetoothCharacteristic characteristic = await getCharacteristicByID(_rotateServoUUID);
     characteristic.write(degreesCode.codeUnits);
   }
-
-  // get action => this._action;
-  // get move => this._move;
-  // get sound => this._sound;
-  // get blink => this._blink;
 }
