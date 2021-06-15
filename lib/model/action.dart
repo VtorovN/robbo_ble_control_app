@@ -1,4 +1,5 @@
 import 'package:ble_control_app/model/utils.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -62,9 +63,10 @@ class _BaseActionWidgetState extends State<BaseActionWidget> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(
+      title: AutoSizeText(
               widget._action._title,
               style: CommonValues.actionTextStyle,
+              maxLines: 2,
             ),
             leading: widget._action._icon,
             onTap: () {

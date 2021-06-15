@@ -19,10 +19,12 @@ class Otto {
 
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
-  BaseAction _action = BaseAction("Action", Icon(Icons.create));
-  BaseAction _move = BaseAction("Move", Icon(Icons.accessibility));
-  BaseAction _sound = BaseAction("Sound", Icon(Icons.audiotrack));
-  BaseAction _blink = BaseAction("Blink", Icon(Icons.lightbulb));
+  BaseAction action() => BaseAction("Action", Icon(Icons.create));
+  BaseAction move() => BaseAction("Move", Icon(Icons.accessibility));
+  BaseAction sound () => BaseAction("Sound", Icon(Icons.audiotrack));
+  BaseAction blink ()=> BaseAction("Blink", Icon(Icons.lightbulb));
+
+
 
   Otto() {
     savedCharacteristics = {
@@ -72,8 +74,8 @@ class Otto {
     characteristic.write(degreesCode.codeUnits);
   }
 
-  get action => this._action;
-  get move => this._move;
-  get sound => this._sound;
-  get blink => this._blink;
+  // get action => this._action;
+  // get move => this._move;
+  // get sound => this._sound;
+  // get blink => this._blink;
 }

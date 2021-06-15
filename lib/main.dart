@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ble_control_app/devices/otto.dart';
 import 'package:ble_control_app/model/action.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,10 +27,11 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(
-          title: Text(
-        'Otto Control App',
-        style: TextStyle(fontSize: 20),
-      )),
+          title: AutoSizeText(
+            'Otto Control App',
+            style: TextStyle(fontSize: 20),
+            maxLines: 1)
+      ),
       routes: {
         DevicesScreen.routeName: (context) => DevicesScreen(),
         ScriptsScreen.routeName: (context) => ScriptsScreen(),
@@ -42,7 +44,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   final _homeActionsButtonsKey = GlobalKey<_HomeActionButtonsState>();
-  final Text title;
+  final AutoSizeText title;
 
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -168,10 +170,10 @@ class EndDrawerWidget extends StatelessWidget {
             ),
           ),
 
-          BaseActionWidget(otto.action, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.action);}),
-          BaseActionWidget(otto.blink, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.blink);}),
-          BaseActionWidget(otto.move, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.move);}),
-          BaseActionWidget(otto.sound, () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.sound);}),
+          BaseActionWidget(otto.action(), () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.action());}),
+          BaseActionWidget(otto.blink(), () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.blink());}),
+          BaseActionWidget(otto.move(), () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.move());}),
+          BaseActionWidget(otto.sound(), () { _homePage._homeActionsButtonsKey.currentState.addGridElementAt(0, otto.sound());}),
         ],
       ),
     );
@@ -327,7 +329,10 @@ class _DraggableButtonState extends State<DraggableButton> {
         child: ElevatedButton(
             onPressed: () {
               if (isEditing) {
-                showBottomSheet(context: context, builder: (context) => EditingBottomSheet(widget.action, widget.key));
+                showModalBottomSheet(
+                  context: context, 
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)), 
+                  builder: (context) => EditingModalBottomSheet(widget.action, widget.key));
               } else {
                 widget.action.onPressed();
               }
@@ -337,23 +342,25 @@ class _DraggableButtonState extends State<DraggableButton> {
                   borderRadius: new BorderRadius.circular(15.0),
                 ),
                 primary: Colors.green.shade300),
-            child: Text(widget.action.title, style: TextStyle(fontSize: 25))),
+            child: 
+              AutoSizeText(widget.action.title, textAlign: TextAlign.center, style: TextStyle(fontSize: 25), maxLines: 2, overflow: TextOverflow.clip,)
+          ),
       );
     });
   }
 }
 
-class EditingBottomSheet extends StatefulWidget { //TODO: Работать с копией и сохранять на Save (copyWith())
+class EditingModalBottomSheet extends StatefulWidget { //TODO: Работать с копией и сохранять на Save (copyWith())
   BaseAction _action;
   GlobalKey<_DraggableButtonState> _draggableButtonState;
   
-  EditingBottomSheet(this._action, this._draggableButtonState);
+  EditingModalBottomSheet(this._action, this._draggableButtonState);
 
   @override
-  _EditingBottomSheetState createState() => _EditingBottomSheetState();
+  _EditingModalBottomSheetState createState() => _EditingModalBottomSheetState();
 }
 
-class _EditingBottomSheetState extends State<EditingBottomSheet> {
+class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
   void _updateState(Function foo) {
     setState(() {
       widget._draggableButtonState.currentState.setState(() {
@@ -364,117 +371,118 @@ class _EditingBottomSheetState extends State<EditingBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    double bottomSheetHeight = MediaQuery.of(context).size.height * 0.6;
     return Container(
-      height: MediaQuery.of(context).size.height * 0.5,
+      height: bottomSheetHeight,
       padding: const EdgeInsets.all(6.0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.green, width: 2.0),
         borderRadius: BorderRadius.circular(10.0),
       ),
-      child: Column(
-        children: <Widget>[
-          Container(
-            height: 40,
-            child: ListTile(title: Text("\"" + widget._action.title + "\" Settings", style: CommonValues.bottomSheetTitleTextStyle,)),
-          ),
-          // Divider(),
-
-          Container(
-            height: 100,
-            child: TextFormField( // Change Name
-              style: TextStyle(fontSize: 20),
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.edit, color: Colors.black38),
-                border: UnderlineInputBorder(),
-                labelText: "Edit name",
-                labelStyle: TextStyle(color: Colors.black38)
-              ),
-              maxLength: 30,
-              initialValue: widget._action.title,
-              onChanged: (text) {
-                _updateState(() { widget._action.title = text; });
-              },
+      child: Scrollbar(
+        child: ListView(
+          
+          children: <Widget>[
+            Container(
+              height: 45,
+              child: ListTile(title: AutoSizeText("\"" + widget._action.title + "\" settings", style: CommonValues.bottomSheetTitleTextStyle, maxLines: 1,)),
             ),
-          ),
-          // Divider(),
 
-          Container(
-            height: 100,
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text("switch", style: CommonValues.bottomSheetSwitchTextStyle,),
-                Transform.scale(
-                  scale: 1.7,
-                  child: Switch(
-                      value: widget._action.mode, 
-                      onChanged: (bool value) {
-                          setState(() { widget._action.mode = value; });
+            Container(
+              height: 100,
+              padding: EdgeInsets.only(right: 15),
+              child: TextFormField( // Change Name
+                style: TextStyle(fontSize: 20),
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.edit, color: Colors.black38),
+                  border: UnderlineInputBorder(),
+                  labelText: "Edit name",
+                  labelStyle: TextStyle(color: Colors.black38)
+                ),
+                maxLength: 20,
+                initialValue: widget._action.title,
+                onChanged: (text) {
+                  _updateState(() { widget._action.title = text; });
+                },
+              ),
+            ),
+
+            Container(
+              height: bottomSheetHeight * 0.25,
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: MediaQuery.of(context).size.width * 0.1),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("switch", style: CommonValues.bottomSheetSwitchTextStyle,),
+                  Transform.scale(
+                    scale: 1.5,
+                    child: Switch(
+                        value: widget._action.mode, 
+                        onChanged: (bool value) {
+                            setState(() { widget._action.mode = value; });
+                        },
+                    ),
+                  ),
+                  Text("hold", style: CommonValues.bottomSheetSwitchTextStyle,),
+                ],
+              ),
+            ),
+            
+            Container(
+              padding: EdgeInsets.all(2),
+              height: 45,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Pin", style: CommonValues.bottomSheetTextStyle,),
+
+                  SliderTheme(data: SliderThemeData(
+                    trackShape: RectangularSliderTrackShape(),
+                    trackHeight: 4.0,
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                    overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+                  ), 
+                  child: 
+                  Container (
+                    width: MediaQuery.of(context).size.width * 0.83,
+                    child: Slider(
+                      min: 1,
+                      max: 32,
+                      divisions: 31,
+                      label: widget._action.pin.toString(),
+                      value: widget._action.pin,
+                      onChanged: (value) {
+                        setState(() {
+                          widget._action.pin = value;
+                        });
                       },
+                    ),)
+                  )
+                ],
+              ),
+            ),
+
+            Container(
+              height: 100,
+              alignment: Alignment.bottomRight,
+              padding: EdgeInsets.only(right: 15),
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.done, size: 20),
+                label: Text('Done', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0),
                   ),
                 ),
-                Text("hold", style: CommonValues.bottomSheetSwitchTextStyle,),
-              ],
-            ),
-          ),
-          // Divider(),
-          
-          Container(
-            padding: EdgeInsets.all(8),
-            height: 45,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("Pin", style: CommonValues.bottomSheetTextStyle,),
-
-                SliderTheme(data: SliderThemeData(
-                  trackShape: RectangularSliderTrackShape(),
-                  trackHeight: 4.0,
-                  thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
-                  overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
-                ), 
-                child: 
-                Container (
-                  width: 320,
-                  child: Slider(
-                    min: 1,
-                    max: 32,
-                    divisions: 31,
-                    label: widget._action.pin.toString(),
-                    value: widget._action.pin,
-                    onChanged: (value) {
-                      setState(() {
-                        widget._action.pin = value;
-                      });
-                    },
-                  ),)
-                )
-              ],
-            ),
-          ),
-          // Divider(),
-
-          Container(
-            height: 100,
-            alignment: Alignment.bottomRight,
-            child: ElevatedButton.icon(
-              icon: Icon(Icons.done, size: 20),
-              label: Text('Done', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              style: ElevatedButton.styleFrom(
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0),
-                ),
+                onPressed: () {
+                  myHomePageState.setState(() { isEditing = false; });
+                  Navigator.pop(context);
+                },
               ),
-              onPressed: () {
-                myHomePageState.setState(() { isEditing = false; });
-                Navigator.pop(context);
-              },
             ),
-          ),
-          // Divider(),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 }
