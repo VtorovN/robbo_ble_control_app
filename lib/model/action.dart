@@ -66,8 +66,9 @@ class BaseAction {
 }
 
 class BaseActionWidget extends StatefulWidget {
-  BaseAction _action;
-  Function _creationFunc;
+  final BaseAction _action;
+  final Function _creationFunc;
+
   BaseActionWidget(this._action, this._creationFunc);
 
   @override
