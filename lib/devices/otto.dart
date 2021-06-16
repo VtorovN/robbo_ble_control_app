@@ -17,10 +17,29 @@ class Otto {
 
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
-  BaseAction action() => BaseAction("Action", Icon(Icons.create));
-  BaseAction move() => BaseAction("Move", Icon(Icons.accessibility));
-  BaseAction sound () => BaseAction("Sound", Icon(Icons.audiotrack));
-  BaseAction blink ()=> BaseAction("Blink", Icon(Icons.lightbulb));
+  BaseAction action() => BaseAction(
+      "Action",
+      Icon(Icons.create),
+      () {}
+  );
+
+  BaseAction move() => BaseAction(
+      "Move",
+      Icon(Icons.accessibility),
+      () {}
+  );
+
+  BaseAction sound () => BaseAction(
+      "Sound",
+      Icon(Icons.audiotrack),
+      () {}
+  );
+
+  BaseAction blink () => BaseAction(
+      "Blink",
+      Icon(Icons.lightbulb),
+      () {}
+  );
 
   Otto() {
     savedCharacteristics = {

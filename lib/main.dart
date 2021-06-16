@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ble_control_app/devices/otto.dart';
 import 'package:ble_control_app/model/action.dart';
+import 'package:ble_control_app/model/tile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/screens/devices.dart';
@@ -11,9 +12,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'model/utils.dart';
-
-final Otto otto = new Otto(); // TODO: куда деть? Нужен вроде везде общий
-bool isEditing = false;
 
 void main() {
   runApp(MyApp());
@@ -42,18 +40,21 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  final _homeActionsButtonsKey = GlobalKey<_HomeActionButtonsState>();
+  static final GlobalKey<_MyHomePageState> _homepageKey = GlobalKey<_MyHomePageState>();
+  static final Otto otto = new Otto();
   final AutoSizeText title;
 
-  MyHomePage({Key key, this.title}) : super(key: key);
+  static GlobalKey<_MyHomePageState> get homepageKey => _homepageKey;
+
+  MyHomePage({ this.title }) : super(key: homepageKey);
 
   @override
-  _MyHomePageState createState() => myHomePageState;
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
-final myHomePageState = _MyHomePageState();
-
 class _MyHomePageState extends State<MyHomePage> {
+  bool isEditing = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,15 +74,26 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Builder(
             builder: (context) => IconButton(
+              icon: Icon(Icons.clear),
+              onPressed: () {
+                setState(() {
+                  HomeActionButtons.globalKey
+                      .currentState.clearGrid();
+                });
+              }
+            ),
+          ),
+          Builder(
+            builder: (context) => IconButton(
               icon: Icon(Icons.add),
               onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
         ],
       ),
-      body: HomeActionButtons(widget._homeActionsButtonsKey),
+      body: HomeActionButtons(),
       drawer: DrawerWidget(),
-      endDrawer: EndDrawerWidget(widget),
+      endDrawer: EndDrawerWidget(),
     );
   }
 }
@@ -145,9 +157,7 @@ class DrawerWidget extends StatelessWidget {
 }
 
 class EndDrawerWidget extends StatelessWidget {
-  final MyHomePage _homePage;
-
-  EndDrawerWidget(this._homePage);
+  EndDrawerWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -168,21 +178,45 @@ class EndDrawerWidget extends StatelessWidget {
               ),
             ),
           ),
-          BaseActionWidget(otto.action(), () {
-            _homePage._homeActionsButtonsKey.currentState
-                .addGridElementAt(0, 0, otto.action());
+          BaseActionWidget(MyHomePage.otto.action(), () {
+            HomeActionButtons.globalKey.currentState
+                .addGridElement(
+                  Tile(
+                      TileSize(1, 1),
+                      TilePosition(0, 0),
+                      MyHomePage.otto.action()
+                  )
+            );
           }),
-          BaseActionWidget(otto.blink(), () {
-            _homePage._homeActionsButtonsKey.currentState
-                .addGridElementAt(0, 0, otto.blink());
+          BaseActionWidget(MyHomePage.otto.blink(), () {
+            HomeActionButtons.globalKey.currentState
+                .addGridElement(
+                Tile(
+                    TileSize(1, 1),
+                    TilePosition(0, 0),
+                    MyHomePage.otto.blink()
+                )
+            );
           }),
-          BaseActionWidget(otto.move(), () {
-            _homePage._homeActionsButtonsKey.currentState
-                .addGridElementAt(0, 0, otto.move());
+          BaseActionWidget(MyHomePage.otto.move(), () {
+            HomeActionButtons.globalKey.currentState
+                .addGridElement(
+                Tile(
+                    TileSize(1, 1),
+                    TilePosition(0, 0),
+                    MyHomePage.otto.move()
+                )
+            );
           }),
-          BaseActionWidget(otto.sound(), () {
-            _homePage._homeActionsButtonsKey.currentState
-                .addGridElementAt(0, 0, otto.sound());
+          BaseActionWidget(MyHomePage.otto.sound(), () {
+            HomeActionButtons.globalKey.currentState
+                .addGridElement(
+                Tile(
+                    TileSize(1, 1),
+                    TilePosition(0, 0),
+                    MyHomePage.otto.sound()
+                )
+            );
           }),
         ],
       ),
@@ -191,11 +225,13 @@ class EndDrawerWidget extends StatelessWidget {
 }
 
 class HomeActionButtons extends StatefulWidget {
-  final GlobalKey<_HomeActionButtonsState> key;
+  static final GlobalKey<_HomeActionButtonsState> _homeActionButtonsKey = GlobalKey<_HomeActionButtonsState>();
   final int _gridSize = 36;
   final int _crossAxisCount = 4;
 
-  HomeActionButtons(this.key) : super(key: key);
+  static GlobalKey<_HomeActionButtonsState> get globalKey => _homeActionButtonsKey;
+
+  HomeActionButtons() : super(key: _homeActionButtonsKey);
 
   @override
   State<StatefulWidget> createState() => new _HomeActionButtonsState();
@@ -247,6 +283,29 @@ class _HomeActionButtonsState extends State<HomeActionButtons>
     return true;
   }
 
+  bool hasPlaceExcludingOldButton(int buttonPosX, int buttonPosY,
+      int buttonWidth, int buttonHeight,
+      int oldButtonWidth, int oldButtonHeight,
+      int posX, int posY) {
+    if (posX + buttonWidth - 1 >= _gridCellsLayout.length ||
+        posY + buttonHeight - 1 >= _gridCellsLayout[0].length) {
+      return false;
+    }
+
+    for (int i = posX; i < posX + buttonWidth; i++) {
+      for (int j = posY; j < posY + buttonHeight; j++) {
+        if (!isIncluded(
+            i, j, buttonPosX, buttonPosY, oldButtonWidth, oldButtonHeight)) {
+          if (_gridCellsLayout[i][j].isOccupied) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
   bool isIncluded(int posX, int posY, int rectPosX, int rectPosY, int rectWidth,
       int rectHeight) {
     if (posX < rectPosX ||
@@ -259,71 +318,93 @@ class _HomeActionButtonsState extends State<HomeActionButtons>
     return true;
   }
 
-  void addGridElementAt(int posX, int posY, BaseAction action) {
-    if (posX < 0 ||
-        posY < 0 ||
-        posX >= _gridCellsLayout.length ||
-        posY >= _gridCellsLayout[0].length) {
-      throw ("Position is out of range");
+  void clearGrid() {
+    _staggeredGridViewChildren = List.filled(0, null, growable: true);
+    _staggeredTiles = List.filled(0, null, growable: true);
+
+    _gridCellsLayout = List.generate(
+        widget._crossAxisCount,
+            (i) => List.generate(
+            widget._gridSize ~/ widget._crossAxisCount, (i) => null));
+
+    for (int i = 0; i < widget._crossAxisCount; i++) {
+      for (int j = 0; j < widget._gridSize ~/ widget._crossAxisCount; j++) {
+        _staggeredGridViewChildren
+            .add(StaggeredTileWithDraggableData(i, j, false));
+        _staggeredTiles.add(StaggeredTile.count(1, 1));
+        _gridCellsLayout[i][j] = _GridLayoutCellPlaceholder(false, false);
+      }
+    }
+  }
+
+  void addGridElement(Tile tile) {
+    if (tile.position.x < 0 ||
+        tile.position.y < 0 ||
+        tile.position.x >= _gridCellsLayout.length ||
+        tile.position.y >= _gridCellsLayout[0].length) {
+      throw ("Button position is out of range of grid");
     }
 
-    if (!hasPlace(posX, posY, action.width, action.height)) {
+    if (!hasPlace(tile.position.x, tile.position.y,
+        tile.size.width, tile.size.height)) {
       throw ('Tiles cannot overlap: position is occupied');
     }
 
-    addTileAndRebuild(posX, posY, action);
+    addTileAndRebuild(tile);
   }
 
-  void addTileAndRebuild(int posX, int posY, BaseAction action) {
-    _gridCellsLayout[posX][posY] =
-        _GridLayoutCellPlaceholder(true, true, action: action);
-    for (int i = 0; i < action.width; i++) {
-      for (int j = 0; j < action.height; j++) {
+  void _addTile(Tile tile) {
+    _gridCellsLayout[tile.position.x][tile.position.y] =
+        _GridLayoutCellPlaceholder(true, true, tile: tile);
+    for (int i = 0; i < tile.size.width; i++) {
+      for (int j = 0; j < tile.size.height; j++) {
         if (i == 0 && j == 0) {
           continue;
         }
-        _gridCellsLayout[posX + i][posY + j] =
+        _gridCellsLayout[tile.position.x + i][tile.position.y + j] =
             _GridLayoutCellPlaceholder(false, true);
       }
     }
+  }
 
+  void addTileAndRebuild(Tile tile) {
+    _addTile(tile);
     buildGrid();
   }
 
-  void removeTileAndRebuild(int posX, int posY, int width, int height,
-      String text, Function onPressed) {
-    _gridCellsLayout[posX][posY] = _GridLayoutCellPlaceholder(false, false);
-    for (int i = 1; i < width; i++) {
-      for (int j = 1; j < height; j++) {
-        _gridCellsLayout[posX + i][posY + j] =
+  void _removeTile(Tile tile) {
+    for (int i = 0; i < tile.size.width; i++) {
+      for (int j = 0; j < tile.size.height; j++) {
+        _gridCellsLayout[tile.position.x + i][tile.position.y + j] =
             _GridLayoutCellPlaceholder(false, false);
       }
     }
+  }
 
+  void removeTileAndRebuild(Tile tile) {
+    _removeTile(tile);
     buildGrid();
   }
 
-  void moveTileAndRebuild(
-      int oldPosX, int oldPosY, int posX, int posY, BaseAction action) {
-    for (int i = 0; i < action.width; i++) {
-      for (int j = 0; j < action.height; j++) {
-        _gridCellsLayout[oldPosX + i][oldPosY + j] =
-            _GridLayoutCellPlaceholder(false, false);
-      }
-    }
+  void _moveTile(Tile tile, int newX, int newY) {
+    _removeTile(tile);
+    tile.position = TilePosition(newX, newY);
+    _addTile(tile);
+  }
 
-    _gridCellsLayout[posX][posY] =
-        _GridLayoutCellPlaceholder(true, true, action: action);
-    for (int i = 0; i < action.width; i++) {
-      for (int j = 0; j < action.height; j++) {
-        if (i == 0 && j == 0) {
-          continue;
-        }
-        _gridCellsLayout[posX + i][posY + j] =
-            _GridLayoutCellPlaceholder(false, true);
-      }
-    }
+  void moveTileAndRebuild(Tile tile, int newX, int newY) {
+    _moveTile(tile, newX, newY);
+    buildGrid();
+  }
 
+  void _resizeTile(Tile tile, int newWidth, int newHeight) {
+    _removeTile(tile);
+    tile.size = TileSize(newWidth, newHeight);
+    _addTile(tile);
+  }
+
+  void resizeTileAndRebuild(Tile tile, int newWidth, int newHeight) {
+    _resizeTile(tile, newWidth, newHeight);
     buildGrid();
   }
 
@@ -339,13 +420,13 @@ class _HomeActionButtonsState extends State<HomeActionButtons>
               i,
               j,
               true,
-              action: _gridCellsLayout[i][j].action,
+              tile: _gridCellsLayout[i][j].tile,
             );
 
             _staggeredGridViewChildren.add(element);
             _staggeredTiles.add(StaggeredTile.count(
-                _gridCellsLayout[i][j].action.width,
-                _gridCellsLayout[i][j].action.height.toDouble()));
+                _gridCellsLayout[i][j].tile.size.width,
+                _gridCellsLayout[i][j].tile.size.height.toDouble()));
           } else if (_gridCellsLayout[i][j].isOccupied) {
             continue;
           } else {
@@ -393,24 +474,7 @@ class _HomeActionButtonsState extends State<HomeActionButtons>
   @override
   void initState() {
     super.initState();
-
-    _staggeredGridViewChildren = List.filled(0, null, growable: true);
-    _staggeredTiles = List.filled(0, null, growable: true);
-
-    // Cartesian coordinate system (x, y)
-    _gridCellsLayout = List.generate(
-        widget._crossAxisCount,
-        (i) => List.generate(
-            widget._gridSize ~/ widget._crossAxisCount, (i) => null));
-
-    for (int i = 0; i < widget._crossAxisCount; i++) {
-      for (int j = 0; j < widget._gridSize ~/ widget._crossAxisCount; j++) {
-        _staggeredGridViewChildren
-            .add(StaggeredTileWithDraggableData(i, j, false));
-        _staggeredTiles.add(StaggeredTile.count(1, 1));
-        _gridCellsLayout[i][j] = _GridLayoutCellPlaceholder(false, false);
-      }
-    }
+    clearGrid();
   }
 
   @override
@@ -464,19 +528,19 @@ class StaggeredTileWithDraggableData extends StatelessWidget {
   final isDataTile;
   final int posX;
   final int posY;
-  final BaseAction action;
+  final Tile tile;
 
   StaggeredTileWithDraggableData(this.posX, this.posY, this.isDataTile,
-      {this.action});
+      {this.tile});
 
   @override
   Widget build(BuildContext context) {
     if (isDataTile) {
-      if (this.action == null) {
-        throw ('Need action to build widget');
+      if (this.tile == null) {
+        throw ('Need tile to build widget');
       }
 
-      return DraggableButton(posX, posY, action);
+      return DraggableButton(posX, posY, tile);
     } else {
       return DragTarget<DraggableButton>(
         builder: (context, candidates, rejects) {
@@ -494,20 +558,17 @@ class StaggeredTileWithDraggableData extends StatelessWidget {
         },
         onWillAccept: (value) {
           return value != null &&
-              context
-                  .findAncestorWidgetOfExactType<HomeActionButtons>()
-                  .key
+              HomeActionButtons.globalKey
                   .currentState
                   .hasPlaceExcludingButton(value.posX, value.posY,
-                      value.action.width, value.action.height, posX, posY);
+                      value.tile.size.width,
+                      value.tile.size.height,
+                      posX, posY);
         },
         onAccept: (button) {
-          context
-              .findAncestorWidgetOfExactType<HomeActionButtons>()
-              .key
+          HomeActionButtons.globalKey
               .currentState
-              .moveTileAndRebuild(
-                  button.posX, button.posY, posX, posY, button.action);
+              .moveTileAndRebuild(button.tile, posX, posY);
         },
       );
     }
@@ -520,21 +581,21 @@ class _GridLayoutCellPlaceholder {
   // Means that this cell is a part of an element
   final bool isOccupied;
 
-  final BaseAction action;
+  final Tile tile;
 
   _GridLayoutCellPlaceholder(this.isElementCell, this.isOccupied,
-      {this.action});
+      {this.tile});
 }
 
 class DraggableButton extends StatefulWidget {
-  final BaseAction _action;
+  final Tile _tile;
   final int posX;
   final int posY;
   final key = GlobalKey<_DraggableButtonState>();
 
-  BaseAction get action => this._action;
+  Tile get tile => this._tile;
 
-  DraggableButton(this.posX, this.posY, this._action);
+  DraggableButton(this.posX, this.posY, this._tile);
 
   @override
   _DraggableButtonState createState() => new _DraggableButtonState();
@@ -562,9 +623,9 @@ class _DraggableButtonState extends State<DraggableButton> {
                     alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: AutoSizeText(
-                      widget.action.title,
+                      widget.tile.action.title,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 25),
+                      style: TextStyle(color: Colors.white, fontSize: 22),
                       maxLines: 2,
                       overflow: TextOverflow.clip,
                     )),
@@ -574,15 +635,15 @@ class _DraggableButtonState extends State<DraggableButton> {
         ),
         child: ElevatedButton(
             onPressed: () {
-              if (isEditing) {
+              if (MyHomePage.homepageKey.currentState.isEditing) {
                 showModalBottomSheet(
                     context: context,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0)),
                     builder: (context) =>
-                        EditingModalBottomSheet(widget.action, widget.key));
+                        EditingModalBottomSheet(widget.tile, widget.key));
               } else {
-                widget.action.onPressed();
+                widget.tile.action.onPressed();
               }
             },
             style: ElevatedButton.styleFrom(
@@ -591,9 +652,9 @@ class _DraggableButtonState extends State<DraggableButton> {
                 ),
                 primary: Colors.green.shade300),
             child: AutoSizeText(
-              widget.action.title,
+              widget.tile.action.title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 25),
+              style: TextStyle(fontSize: 22),
               maxLines: 2,
               overflow: TextOverflow.clip,
             )),
@@ -604,10 +665,10 @@ class _DraggableButtonState extends State<DraggableButton> {
 
 class EditingModalBottomSheet extends StatefulWidget {
   //TODO: Работать с копией и сохранять на Done (copyWith())
-  final BaseAction _action;
+  final Tile _tile;
   final GlobalKey<_DraggableButtonState> _draggableButtonState;
 
-  EditingModalBottomSheet(this._action, this._draggableButtonState);
+  EditingModalBottomSheet(this._tile, this._draggableButtonState);
 
   @override
   _EditingModalBottomSheetState createState() =>
@@ -615,27 +676,66 @@ class EditingModalBottomSheet extends StatefulWidget {
 }
 
 class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
-  void _updateState(Function foo) {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void _updateState(Function updatingFunction) {
     setState(() {
       widget._draggableButtonState.currentState.setState(() {
-        foo();
+        updatingFunction();
       });
     });
   }
 
-  Widget _sizeDropDownButton(bool axis, double dropdownValue) {
-    return DropdownButton<double>(
+  Widget _sizeDropDownButton(bool axis, int dropdownValue) {
+    return DropdownButton<int>(
       value: dropdownValue,
       underline: Container(
         height: 1,
       ),
-      onChanged: (double newValue) {
-        _updateState(() => axis
-            ? widget._action.width = newValue
-            : widget._action.height = newValue);
+      onChanged: (int newValue) {
+        bool hasPlace = HomeActionButtons
+            .globalKey
+            .currentState
+            .hasPlaceExcludingOldButton(
+            widget._tile.position.x,
+            widget._tile.position.y,
+            axis
+                ? newValue
+                : widget._tile.size.width,
+            axis
+                ? widget._tile.size.height
+                : newValue,
+            widget._tile.size.width,
+            widget._tile.size.height,
+            widget._tile.position.x,
+            widget._tile.position.y);
+        if (hasPlace) {
+          _updateState(() {
+            HomeActionButtons.globalKey.currentState.resizeTileAndRebuild(
+                widget._tile,
+                axis
+                    ? newValue
+                    : widget._tile.size.width,
+                axis
+                    ? widget._tile.size.height
+                    : newValue,
+            );
+          });
+        }
+        else {
+          final scaffoldMessenger = ScaffoldMessenger
+              .of(_scaffoldKey.currentContext);
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+                content: Text ('Cannot resize button: not enough space'),
+                behavior: SnackBarBehavior.floating,
+                duration: Duration(seconds: 2),
+            ),
+          );
+        }
       },
-      items: <double>[1, 2, 3].map<DropdownMenuItem<double>>((double value) {
-        return DropdownMenuItem<double>(
+      items: <int>[1, 2, 3].map<DropdownMenuItem<int>>((int value) {
+        return DropdownMenuItem<int>(
           value: value,
           child: Text(
             value.toString(),
@@ -649,160 +749,162 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
   @override
   Widget build(BuildContext context) {
     double bottomSheetHeight = MediaQuery.of(context).size.height * 0.6;
-
-    return Container(
-        height: bottomSheetHeight,
-        padding: const EdgeInsets.all(6.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.green, width: 2.0),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Scrollbar(
-          child: ListView(
-            children: <Widget>[
-              Container(
-                // Title
-                height: 45,
-                child: ListTile(
-                    title: AutoSizeText(
-                  "\"" + widget._action.title + "\" settings",
-                  style: CommonValues.bottomSheetTitleTextStyle,
-                  maxLines: 1,
-                )),
-              ),
-              Container(
-                // Change Name
-                height: 100,
-                padding: EdgeInsets.only(right: 15),
-                child: TextFormField(
-                  style: TextStyle(fontSize: 20),
-                  decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.edit, color: Colors.black38),
-                      border: UnderlineInputBorder(),
-                      labelText: "Edit name",
-                      labelStyle: TextStyle(color: Colors.black38)),
-                  maxLength: 20,
-                  initialValue: widget._action.title,
-                  onChanged: (text) {
-                    _updateState(() {
-                      widget._action.title = text;
-                    });
-                  },
+    return Scaffold(
+      key: _scaffoldKey,
+      body:Container(
+          height: bottomSheetHeight,
+          padding: const EdgeInsets.all(6.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.green, width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Scrollbar(
+            child: ListView(
+              children: <Widget>[
+                Container(
+                  // Title
+                  height: 45,
+                  child: ListTile(
+                      title: AutoSizeText(
+                        "\"" + widget._tile.action.title + "\" settings",
+                        style: CommonValues.bottomSheetTitleTextStyle,
+                        maxLines: 1,
+                      )),
                 ),
-              ),
-              Container(
-                // Mode Switch
-                height: bottomSheetHeight * 0.25,
-                padding: EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: MediaQuery.of(context).size.width * 0.1),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "switch",
-                      style: CommonValues.bottomSheetSwitchTextStyle,
-                    ),
-                    Transform.scale(
-                      scale: 1.5,
-                      child: Switch(
-                        value: widget._action.mode,
-                        onChanged: (bool value) {
-                          setState(() {
-                            widget._action.mode = value;
-                          });
-                        },
+                Container(
+                  // Change Name
+                  height: 100,
+                  padding: EdgeInsets.only(right: 15),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 20),
+                    decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.edit, color: Colors.black38),
+                        border: UnderlineInputBorder(),
+                        labelText: "Edit name",
+                        labelStyle: TextStyle(color: Colors.black38)),
+                    maxLength: 20,
+                    initialValue: widget._tile.action.title,
+                    onChanged: (text) {
+                      _updateState(() {
+                        widget._tile.action.title = text;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  // Mode Switch
+                  height: bottomSheetHeight * 0.25,
+                  padding: EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: MediaQuery.of(context).size.width * 0.1),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "switch",
+                        style: CommonValues.bottomSheetSwitchTextStyle,
+                      ),
+                      Transform.scale(
+                        scale: 1.5,
+                        child: Switch(
+                          value: widget._tile.action.mode,
+                          onChanged: (bool value) {
+                            setState(() {
+                              widget._tile.action.mode = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Text(
+                        "hold",
+                        style: CommonValues.bottomSheetSwitchTextStyle,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  // Pin Slider
+                  padding: EdgeInsets.all(2),
+                  height: 45,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Pin",
+                        style: CommonValues.bottomSheetTextStyle,
+                      ),
+                      SliderTheme(
+                          data: SliderThemeData(
+                            trackShape: RectangularSliderTrackShape(),
+                            trackHeight: 4.0,
+                            thumbShape:
+                            RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                            overlayShape:
+                            RoundSliderOverlayShape(overlayRadius: 28.0),
+                          ),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.83,
+                            child: Slider(
+                              min: 1,
+                              max: 32,
+                              divisions: 31,
+                              label: widget._tile.action.pin.toInt().toString(),
+                              value: widget._tile.action.pin,
+                              onChanged: (value) {
+                                setState(() {
+                                  widget._tile.action.pin = value;
+                                });
+                              },
+                            ),
+                          ))
+                    ],
+                  ),
+                ),
+                Container(
+                  // SizeChanger
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "width:",
+                        style: CommonValues.bottomSheetTextStyle,
+                      ),
+                      _sizeDropDownButton(true, widget._tile.size.width),
+                      Text(
+                        "height:",
+                        style: CommonValues.bottomSheetTextStyle,
+                      ),
+                      _sizeDropDownButton(false, widget._tile.size.height)
+                    ],
+                  ),
+                ),
+                Container(
+                  // Done Button
+                  height: 80,
+                  alignment: Alignment.bottomRight,
+                  padding: EdgeInsets.only(right: 15),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.done, size: 20),
+                    label: Text('Done',
+                        style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0),
                       ),
                     ),
-                    Text(
-                      "hold",
-                      style: CommonValues.bottomSheetSwitchTextStyle,
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                // Pin Slider
-                padding: EdgeInsets.all(2),
-                height: 45,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Pin",
-                      style: CommonValues.bottomSheetTextStyle,
-                    ),
-                    SliderTheme(
-                        data: SliderThemeData(
-                          trackShape: RectangularSliderTrackShape(),
-                          trackHeight: 4.0,
-                          thumbShape:
-                              RoundSliderThumbShape(enabledThumbRadius: 12.0),
-                          overlayShape:
-                              RoundSliderOverlayShape(overlayRadius: 28.0),
-                        ),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.83,
-                          child: Slider(
-                            min: 1,
-                            max: 32,
-                            divisions: 31,
-                            label: widget._action.pin.toString(),
-                            value: widget._action.pin,
-                            onChanged: (value) {
-                              setState(() {
-                                widget._action.pin = value;
-                              });
-                            },
-                          ),
-                        ))
-                  ],
-                ),
-              ),
-              Container(
-                // SizeChanger
-                height: 50,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "width:",
-                      style: CommonValues.bottomSheetTextStyle,
-                    ),
-                    _sizeDropDownButton(true, widget._action.width),
-                    Text(
-                      "height:",
-                      style: CommonValues.bottomSheetTextStyle,
-                    ),
-                    _sizeDropDownButton(false, widget._action.height)
-                  ],
-                ),
-              ),
-              Container(
-                // Done Button
-                height: 80,
-                alignment: Alignment.bottomRight,
-                padding: EdgeInsets.only(right: 15),
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.done, size: 20),
-                  label: Text('Done',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0),
-                    ),
+                    onPressed: () {
+                      HomeActionButtons.globalKey.currentState.setState(() {
+                        MyHomePage.homepageKey.currentState.isEditing = false;
+                      });
+                      Navigator.pop(context);
+                    },
                   ),
-                  onPressed: () {
-                    myHomePageState.setState(() {
-                      isEditing = false;
-                    });
-                    Navigator.pop(context);
-                  },
                 ),
-              ),
-            ],
-          ),
-        ));
+              ],
+            ),
+          ))
+    );
   }
 }
