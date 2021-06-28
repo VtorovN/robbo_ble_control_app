@@ -87,7 +87,7 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
         key: _scaffoldKey,
         body: Container(
             height: bottomSheetHeight,
-            padding: EdgeInsets.all(6.0),
+            padding: const EdgeInsets.all(6.0),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.green, width: 2.0),
               borderRadius: BorderRadius.circular(10.0),
@@ -230,7 +230,7 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
                         ),
                       ),
                       onPressed: () {
-                        HomeGridView.globalKey.currentState.setState(() {
+                        HomePage.homepageKey.currentState.setState(() {
                           HomePage.homepageKey.currentState.isEditing = false;
                         });
                         Navigator.pop(context);

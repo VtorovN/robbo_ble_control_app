@@ -415,8 +415,9 @@ class DraggableButtonState extends State<DraggableButton> {
                     child: AutoSizeText(
                       widget.tile.action.title,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 22),
+                      style: TextStyle(color: Colors.white, fontSize: 25),
                       maxLines: 2,
+                      wrapWords: false,
                       overflow: TextOverflow.clip,
                     )),
               ),
@@ -426,12 +427,16 @@ class DraggableButtonState extends State<DraggableButton> {
         child: ElevatedButton(
             onPressed: () {
               if (HomePage.homepageKey.currentState.isEditing) {
-                showModalBottomSheet(
+                var modalBottomSheet = showModalBottomSheet(
                     context: context,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0)),
                     builder: (context) =>
                         EditingModalBottomSheet(widget.tile, widget.key));
+                modalBottomSheet.whenComplete(
+                    () => HomePage.homepageKey.currentState.setState(() {
+                          HomePage.homepageKey.currentState.isEditing = false;
+                        }));
               } else {
                 widget.tile.action.onPressed();
               }
@@ -441,13 +446,15 @@ class DraggableButtonState extends State<DraggableButton> {
                   borderRadius: BorderRadius.circular(15.0),
                 ),
                 primary: Colors.green.shade300),
-            child: AutoSizeText(
+            child: Container(
+                child: AutoSizeText(
               widget.tile.action.title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 25),
               maxLines: 2,
+              wrapWords: false,
               overflow: TextOverflow.clip,
-            )),
+            ))),
       );
     });
   }
