@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:ble_control_app/devices/database.dart';
 
 class DevicesScreen extends StatefulWidget {
   static const routeName = '/devices';
 
   @override
   _DevicesScreenState createState() {
-    SavedDevicesDatabase.init();
     return _DevicesScreenState();
   }
 }
@@ -135,23 +133,6 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 color: Colors.black
               ),
             ),
-            // ElevatedButton(
-            //     child: deviceSaved ? Text('DELETE') : Text('SAVE'),
-            //     style: ButtonStyle(
-            //         backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
-            //         textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(color: Colors.white))
-            //     ),
-            //     onPressed: () async {
-            //       if (deviceSaved) {
-            //         SavedDevicesDatabase.removeDeviceID(device.id.id);
-            //       }
-            //       else {
-            //         SavedDevicesDatabase.addDeviceID(device.id.id);
-            //       }
-            //
-            //       setState(() {});
-            //     }
-            // ),
             ElevatedButton(
                 child: Text('DISCONNECT'),
                 style: ButtonStyle(
