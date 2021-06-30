@@ -27,6 +27,7 @@ class BLEAPI {
     await device.connect(autoConnect: false);
 
     List<BluetoothDevice> connectedDevices = await _fb.connectedDevices;
+
     if(connectedDevices.contains(device)) {
       _connectedDevice = device;
       return true;

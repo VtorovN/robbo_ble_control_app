@@ -1,9 +1,10 @@
+import 'package:ble_control_app/model/action.dart';
+import 'package:ble_control_app/bluetooth/ble_api.dart';
+
 import 'dart:async';
 
-import 'package:ble_control_app/model/action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:ble_control_app/bluetooth/ble_api.dart';
 
 class Otto {
   BluetoothService _service;

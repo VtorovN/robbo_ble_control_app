@@ -1,11 +1,5 @@
-import 'package:ble_control_app/model/utils.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-// Helper functions for enum
-// String enumToString(Object o) => o.toString().split('.').last;
-// T enumFromString<T>(String key, List<T> values) => values.firstWhere((v) => key == enumToString(v), orElse: () => null);
 
 class BaseAction {
   String _title;
@@ -37,32 +31,4 @@ class BaseAction {
 
   bool get mode => _mode;
   set mode(value) => this._mode = value;
-}
-
-class BaseActionWidget extends StatefulWidget {
-  final BaseAction _action;
-  final Function _creationFunc;
-
-  BaseActionWidget(this._action, this._creationFunc);
-
-  @override
-  State<StatefulWidget> createState() => _BaseActionWidgetState();
-}
-
-class _BaseActionWidgetState extends State<BaseActionWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: AutoSizeText(
-              widget._action._title,
-              style: CommonValues.actionTextStyle,
-              maxLines: 2,
-            ),
-            leading: widget._action._icon,
-            onTap: () {
-              widget._creationFunc();
-              Navigator.pop(context);
-            }
-    );
-  }
 }
