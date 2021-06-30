@@ -4,10 +4,10 @@ import 'package:ble_control_app/bluetooth/ble_api.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
 class Otto {
-  BluetoothService _service;
+  DiscoveredService _service;
 
   final String _serviceUUID = "fe16f2b0-7783-11eb-9881-0800200c9a66";
 
@@ -16,7 +16,7 @@ class Otto {
   final String _blinkBlueUUID = "788b23f8-b3e4-11eb-8529-0242ac130003";
   final String _rotateServoUUID = "c6e083e4-b3db-11eb-8529-0242ac130003";
 
-  Map<String, BluetoothCharacteristic> savedCharacteristics;
+  Map<String, QualifiedCharacteristic> savedCharacteristics;
 
   BaseAction action() => BaseAction(
       "Action",
@@ -52,11 +52,11 @@ class Otto {
   }
 
   Future _initService() async {
-    List<BluetoothService> services = await BLEAPI.instance.getServices();
-    _service = services.firstWhere((service) => service.uuid.toString() == _serviceUUID);
+    List<DiscoveredService> services = await BLEAPI.instance.getServices();
+    _service = services.firstWhere((service) => service.serviceId.toString() == _serviceUUID);
   }
 
-  Future<BluetoothCharacteristic> getCharacteristicByID(String id) async {
+  Future<QualifiedCharacteristic> getCharacteristicByID(String id) async {
     if (_service == null) {
       await _initService();
     }
@@ -65,28 +65,37 @@ class Otto {
       return savedCharacteristics[id];
     }
 
-    return savedCharacteristics[id] =
-        _service.characteristics.firstWhere((characteristic) => characteristic.uuid.toString() == id);
+    Uuid characteristicUuid = Uuid.parse(id);
+
+    if (!_service.characteristicIds.contains(Uuid.parse(id))) {
+      return null;
+    }
+
+    return savedCharacteristics[id] = QualifiedCharacteristic(
+        characteristicId: characteristicUuid,
+        serviceId: _service.serviceId,
+        deviceId: BLEAPI.instance.connectedDevice.id
+    );
   }
 
   void blinkRed() async {
-    BluetoothCharacteristic characteristic = await getCharacteristicByID(_blinkRedUUID);
-    characteristic.write([49]);
+    QualifiedCharacteristic characteristic = await getCharacteristicByID(_blinkRedUUID);
+    BLEAPI.instance.writeCharacteristic(characteristic, [49]);
   }
 
   void blinkGreen() async {
-    BluetoothCharacteristic characteristic = await getCharacteristicByID(_blinkGreenUUID);
-    characteristic.write([49]);
+    QualifiedCharacteristic characteristic = await getCharacteristicByID(_blinkGreenUUID);
+    BLEAPI.instance.writeCharacteristic(characteristic, [49]);
   }
 
   void blinkBlue() async {
-    BluetoothCharacteristic characteristic = await getCharacteristicByID(_blinkBlueUUID);
-    characteristic.write([49]);
+    QualifiedCharacteristic characteristic = await getCharacteristicByID(_blinkBlueUUID);
+    BLEAPI.instance.writeCharacteristic(characteristic, [49]);
   }
 
   void rotateServo(int degrees) async {
     String degreesCode = degrees.toString();
-    BluetoothCharacteristic characteristic = await getCharacteristicByID(_rotateServoUUID);
-    characteristic.write(degreesCode.codeUnits);
+    QualifiedCharacteristic characteristic = await getCharacteristicByID(_rotateServoUUID);
+    BLEAPI.instance.writeCharacteristic(characteristic, degreesCode.codeUnits);
   }
 }

@@ -1,6 +1,8 @@
+import 'package:ble_control_app/bluetooth/scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:provider/provider.dart';
 
 class DevicesScreen extends StatefulWidget {
   static const routeName = '/devices';
@@ -13,7 +15,7 @@ class DevicesScreen extends StatefulWidget {
 
 class _DevicesScreenState extends State<DevicesScreen> {
   Widget _buildBluetoothStateScreen(
-      BuildContext context, BluetoothState bluetoothState) {
+      BuildContext context, BleStatus bluetoothState) {
     return Scaffold(
       body: Center(
         child: Column(
@@ -34,62 +36,69 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
 
   Widget _buildDeviceList(BuildContext context) {
-    BLEAPI.instance.startScan();
+    BLEAPI.instance.startScan(5);
 
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () => BLEAPI.instance.startScan(),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              StreamBuilder<List<ScanResult>>(
-                stream: BLEAPI.instance.getScanResults(),
-                initialData: [],
-                builder: (c, snapshot) => Column(
-                  children: snapshot.data
-                      .map(
-                        (r) => ScanResultTile(
-                          result: r,
-                          onTap: () async {
-                            bool connectionSuccess =
-                                await BLEAPI.instance.connect(r.device);
-                            if (connectionSuccess) {
-                              setState(() {});
-                            }
-                            return connectionSuccess;
-                          },
-                        ),
-                      )
-                      .toList(),
+    return StreamProvider(
+      create: (_) => BLEAPI.instance.getScannerState(),
+      initialData: const BleScannerState(
+        discoveredDevices: [],
+        scanIsInProgress: false,
+      ),
+      child: Builder(
+        builder: (context) {
+          var scannerState = Provider.of<BleScannerState>(context);
+
+          return Scaffold(
+            body: RefreshIndicator(
+              onRefresh: () async => BLEAPI.instance.startScan(5),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: <Widget>[
+                    Column(
+                        children: scannerState.discoveredDevices.map(
+                              (r) => ScanResultTile(
+                                result: r,
+                                onTap: () async {
+                                  bool connectionSuccess =
+                                    await BLEAPI.instance.connect(r);
+                                  if (connectionSuccess) {
+                                    setState(() {});
+                                  }
+                                  return connectionSuccess;
+                                  },
+                              ),
+                        ).toList()
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: StreamBuilder<bool>(
-        stream: BLEAPI.instance.isScanningStream(),
-        initialData: false,
-        builder: (c, snapshot) {
-          if (snapshot.data) {
-            return FloatingActionButton(
-              child: Icon(Icons.stop),
-              onPressed: () => BLEAPI.instance.stopScan(),
-              backgroundColor: Colors.red,
-            );
-          } else {
-            return FloatingActionButton(
-              child: Icon(Icons.search),
-              onPressed: () => BLEAPI.instance.startScan(),
-            );
-          }
-        },
-      ),
+            ),
+            floatingActionButton: Builder(
+                builder: (context) {
+                  if (scannerState.scanIsInProgress) {
+                    return FloatingActionButton(
+                      child: Icon(Icons.stop),
+                      onPressed: () => BLEAPI.instance.stopScan(),
+                      backgroundColor: Colors.red,
+                    );
+                  }
+                  else {
+                    return FloatingActionButton(
+                      child: Icon(Icons.search),
+                      onPressed: () => BLEAPI.instance.startScan(5),
+                    );
+                  }
+                }
+            ),
+          );
+        }
+      )
     );
   }
 
   Widget _buildDeviceName(BuildContext context) {
-    BluetoothDevice device = BLEAPI.instance.connectedDevice;
+    DiscoveredDevice device = BLEAPI.instance.connectedDevice;
 
     if (device.name.length > 0) {
       return Column(
@@ -116,9 +125,6 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
 
   Future<Widget> _buildDeviceInfo(BuildContext context) async {
-    BluetoothDevice device = BLEAPI.instance.connectedDevice;
-    //bool deviceSaved = await SavedDevicesDatabase.contains(device.id.id);
-
     return Scaffold(
       body: Center(
         child: Column(
@@ -127,7 +133,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
           children: [
             _buildDeviceName(context),
             Text(
-              (await BLEAPI.instance.connectedDevice.state.first).toString(),
+              BLEAPI.instance.connectedDevice.name,
               style: TextStyle(
                 fontSize: 20,
                 color: Colors.black
@@ -150,6 +156,13 @@ class _DevicesScreenState extends State<DevicesScreen> {
     );
   }
 
+
+  @override
+  void dispose() {
+    BLEAPI.instance.stopScan();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,8 +172,8 @@ class _DevicesScreenState extends State<DevicesScreen> {
       body: StreamBuilder(
           stream: BLEAPI.instance.getBluetoothState(),
           builder:
-              (BuildContext context, AsyncSnapshot<BluetoothState> snapshot) {
-            if (snapshot.hasData && snapshot.data != BluetoothState.on) {
+              (BuildContext context, AsyncSnapshot<BleStatus> snapshot) {
+            if (snapshot.hasData && snapshot.data != BleStatus.ready) {
               return _buildBluetoothStateScreen(context, snapshot.data);
             } else
               return FutureBuilder(
@@ -192,40 +205,35 @@ class _DevicesScreenState extends State<DevicesScreen> {
 class ScanResultTile extends StatefulWidget {
   ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
 
-  final ScanResult result;
+  final DiscoveredDevice result;
   final Future<bool> Function() onTap;
 
   @override
   _ScanResultTileState createState() =>
-      _ScanResultTileState(result: result, onTap: onTap);
+      _ScanResultTileState();
 }
 
 class _ScanResultTileState extends State<ScanResultTile> {
-  _ScanResultTileState({this.result, this.onTap});
-
-  final ScanResult result;
-  final Future<bool> Function() onTap;
-
   bool connecting = false;
 
   Widget _buildTitle(BuildContext context) {
-    if (result.device.name.length > 0) {
+    if (widget.result.name.length > 0) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            result.device.name,
+            widget.result.name,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            result.device.id.toString(),
+            widget.result.id.toString(),
             style: Theme.of(context).textTheme.caption,
           )
         ],
       );
     } else {
-      return Text(result.device.id.toString());
+      return Text(widget.result.id.toString());
     }
   }
 
@@ -241,7 +249,7 @@ class _ScanResultTileState extends State<ScanResultTile> {
                 TextStyle(color: Colors.white))),
         onPressed: () async {
           connecting = true;
-          bool connectionSuccess = await onTap();
+          bool connectionSuccess = await widget.onTap();
           if (!connectionSuccess) {
             setState(() {
               connecting = false;
@@ -254,7 +262,7 @@ class _ScanResultTileState extends State<ScanResultTile> {
 
   @override
   Widget build(BuildContext context) {
-    if (result == null || !result.advertisementData.connectable) {
+    if (widget.result == null) {
       return Container();
     }
 

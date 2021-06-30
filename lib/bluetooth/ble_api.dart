@@ -1,69 +1,95 @@
-import 'package:flutter_blue/flutter_blue.dart';
+import 'dart:async';
+
+import 'package:ble_control_app/bluetooth/scanner.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 
 class BLEAPI {
-  static BLEAPI instance = new BLEAPI();
-  static BluetoothDevice _connectedDevice;
-  static FlutterBlue _fb = FlutterBlue.instance;
+  static final BLEAPI instance = new BLEAPI();
+  static final FlutterReactiveBle _ble = FlutterReactiveBle();
+  static final _deviceConnectionController =
+      StreamController<ConnectionStateUpdate>.broadcast();
+  static final BleScanner _bleScanner = BleScanner(_ble);
+  static DiscoveredDevice _connectedDevice;
+  static StreamSubscription<ConnectionStateUpdate> _deviceConnection;
 
-  Future<void> startScan() async {
-    if (!(await _fb.isScanning.isEmpty) && await _fb.isScanning.first == false) {
-      return _fb.startScan(timeout: Duration(seconds: 5));
-    }
+  Future<void> startScan(int seconds) async {
+    _bleScanner.startScan();
+    return Future.delayed(Duration(seconds: seconds), () async {
+      await stopScan();
+    });
   }
 
   Future<void> stopScan() async {
-    return _fb.stopScan();
+    return _bleScanner.stopScan();
   }
 
-  Stream<List<ScanResult>> getScanResults() {
-    return _fb.scanResults;
-  }
-
-  Future<bool> connect(BluetoothDevice device) async {
+  Future<bool> connect(DiscoveredDevice device) async {
     if (_connectedDevice != null) {
       await disconnect();
     }
 
-    await device.connect(autoConnect: false);
+    var completer = Completer<bool>();
 
-    List<BluetoothDevice> connectedDevices = await _fb.connectedDevices;
+    var stream = _ble.connectToDevice(
+      id: device.id,
+      connectionTimeout: Duration(seconds: 2),
+    );
 
-    if(connectedDevices.contains(device)) {
-      _connectedDevice = device;
-      return true;
-    }
-    else return false;
+    _deviceConnection = stream.listen((event) {
+      _deviceConnectionController.add(event);
+
+      if (event.connectionState == DeviceConnectionState.connected) {
+        _connectedDevice = device;
+        completer.complete(true);
+      }
+    });
+
+    return completer.future;
   }
 
   Future<void> disconnect() async {
-    await _connectedDevice.disconnect();
-    _connectedDevice = null;
+    try {
+      await _deviceConnection.cancel();
+    } on Exception catch (e, _) {
+      print('Disconnect failed');
+      print(e);
+      print(_);
+    } finally {
+      // Since [_connection] subscription is terminated, the "disconnected" state cannot be received and propagated
+      _deviceConnectionController.add(
+        ConnectionStateUpdate(
+          deviceId: _connectedDevice.id,
+          connectionState: DeviceConnectionState.disconnected,
+          failure: null,
+        ),
+      );
+      _connectedDevice = null;
+    }
   }
 
   Future<bool> isConnected() async {
-    if(await _connectedDevice.state.first == BluetoothDeviceState.connected) {
-      return true;
-    }
-    else {
-      _connectedDevice = null;
-      return false;
-    }
+    return _connectedDevice != null;
   }
 
-  Future<List<BluetoothService>> getServices() async {
+  Future<List<DiscoveredService>> getServices() async {
     if (_connectedDevice != null) {
-      return _connectedDevice.discoverServices();
-    }
-    else return null;
+      return _ble.discoverServices(_connectedDevice.id);
+    } else
+      return null;
   }
 
-  Stream<bool> isScanningStream() {
-    return _fb.isScanning;
+  DiscoveredDevice get connectedDevice => _connectedDevice;
+
+  Stream<BleStatus> getBluetoothState() {
+    return _ble.statusStream;
   }
 
-  BluetoothDevice get connectedDevice => _connectedDevice;
+  void writeCharacteristic(
+      QualifiedCharacteristic characteristic, List<int> value) {
+    _ble.writeCharacteristicWithoutResponse(characteristic, value: value);
+  }
 
-  Stream<BluetoothState> getBluetoothState() {
-    return _fb.state;
+  Stream<BleScannerState> getScannerState() {
+    return _bleScanner.state;
   }
 }

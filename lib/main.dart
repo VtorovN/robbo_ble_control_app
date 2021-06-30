@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:ble_control_app/bluetooth/scanner.dart';
 import 'package:ble_control_app/screens/home/home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,29 @@ import 'package:ble_control_app/screens/devices.dart';
 import 'package:ble_control_app/screens/scripts.dart';
 import 'package:ble_control_app/screens/settings.dart';
 import 'package:ble_control_app/screens/about.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(App());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final FlutterReactiveBle _ble = FlutterReactiveBle();
+  final BleScanner _scanner = BleScanner(_ble);
+
+  runApp(
+      MultiProvider(
+          providers: [
+            StreamProvider<BleScannerState>(
+              create: (_) => _scanner.state,
+              initialData: const BleScannerState(
+                discoveredDevices: [],
+                scanIsInProgress: false,
+              ),
+            ),
+          ],
+          child: App()
+      )
+  );
 }
 
 class App extends StatelessWidget {
