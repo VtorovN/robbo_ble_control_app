@@ -36,6 +36,14 @@ BLECharacteristic *characteristicServo;
 
 std::__cxx11::string previousServoValue = "0";
 
+class MyServerCallbacks: public BLEServerCallbacks {
+    void onConnect(BLEServer* pServer) { };
+
+    void onDisconnect(BLEServer* pServer) {
+      BLEDevice::startAdvertising();
+    }
+};
+
 void setup() {
   pinMode(LED_RED, OUTPUT);
   digitalWrite(LED_RED, HIGH);
@@ -51,6 +59,8 @@ void setup() {
 
   BLEDevice::init("ESP32 BLE");
   BLEServer *pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
+  
   BLEService *pService = pServer->createService(SERVICE_UUID);
   characteristicLedRed = pService->createCharacteristic(
                                   RED_LED_CHARACTERISTIC_UUID,
