@@ -1,4 +1,5 @@
-import 'package:ble_control_app/model/action.dart';
+import 'package:ble_control_app/model/base_action.dart';
+import 'package:flutter/material.dart';
 
 class TileSize {
   int _height;
@@ -30,6 +31,7 @@ class Tile {
   TileSize _size;
   TilePosition _tilePosition;
   BaseAction _action;
+  Widget _editingBottomSheet;
 
   Tile(this._size, this._tilePosition, this._action);
 

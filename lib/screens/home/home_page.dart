@@ -1,4 +1,6 @@
+import 'package:ble_control_app/devices/device.dart';
 import 'package:ble_control_app/devices/otto.dart';
+import 'package:ble_control_app/devices/robbo_platform.dart';
 import 'package:ble_control_app/screens/home/widgets/drawer.dart';
 import 'package:ble_control_app/screens/home/widgets/end_drawer.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
@@ -10,7 +12,7 @@ import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
   static final GlobalKey<_HomePageState> _homepageKey = GlobalKey<_HomePageState>();
-  static final Otto otto = new Otto();
+  static final List<Device> devices = <Device>[ new Device(), new Otto(), new RobboPlatform() ];
   final AutoSizeText title;
 
   static GlobalKey<_HomePageState> get homepageKey => _homepageKey;

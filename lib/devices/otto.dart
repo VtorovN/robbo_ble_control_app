@@ -1,12 +1,11 @@
-import 'package:ble_control_app/model/action.dart';
+import 'package:ble_control_app/devices/device.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
-class Otto {
+class Otto extends Device {
   BluetoothService _service;
 
   final String _serviceUUID = "fe16f2b0-7783-11eb-9881-0800200c9a66";
@@ -18,29 +17,13 @@ class Otto {
 
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
-  BaseAction action() => BaseAction(
-      "Action",
-      Icon(Icons.create),
-      () {}
-  );
+  @override
+  String name = "Otto";
+  String get getName => name;
 
-  BaseAction move() => BaseAction(
-      "Move",
-      Icon(Icons.accessibility),
-      () {}
-  );
-
-  BaseAction sound () => BaseAction(
-      "Sound",
-      Icon(Icons.audiotrack),
-      () {}
-  );
-
-  BaseAction blink () => BaseAction(
-      "Blink",
-      Icon(Icons.lightbulb),
-      () {}
-  );
+  @override
+  List<Function> _actions = <Function>[];
+  List<Function> get actions => _actions;
 
   Otto() {
     savedCharacteristics = {
@@ -49,6 +32,11 @@ class Otto {
       _blinkBlueUUID : null,
       _rotateServoUUID : null
     };
+
+    _actions.add(super.button);
+    _actions.add(super.sound);
+    _actions.add(super.blink);
+    _actions.add(super.move);
   }
 
   Future _initService() async {
