@@ -1,4 +1,5 @@
 import 'package:ble_control_app/devices/device.dart';
+import 'package:ble_control_app/model/actions_set.dart';
 import 'package:ble_control_app/model/base_action.dart';
 import 'package:ble_control_app/model/tile.dart';
 import 'package:ble_control_app/screens/home/home_page.dart';
@@ -11,11 +12,11 @@ import 'package:flutter/material.dart';
 
 class EndDrawerWidget extends StatefulWidget {
   
-  Device _currentDevice;
+  ActionsSet _currentActionsSet;
 
   EndDrawerWidget() {
-    if (_currentDevice == null) {
-      _currentDevice = HomePage.devices.first;
+    if (_currentActionsSet == null) {
+      _currentActionsSet = ActionsSet();
     }
   }
 
@@ -41,11 +42,11 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               itemExtent: 40, 
               onSelectedItemChanged: (newValue) {
                 setState(() {
-                  widget._currentDevice = HomePage.devices.elementAt(newValue);
+                  widget._currentActionsSet = HomePage.sets.getSet(HomePage.devices.elementAt(newValue).name);
                 });
               }, 
-              children: HomePage.devices.map<AutoSizeText>((Device device) => 
-                AutoSizeText(device.name, style: TextStyle(fontSize: 24),)).toList()
+              children: HomePage.sets.get().keys.map<AutoSizeText>((String set) => 
+                AutoSizeText(set, style: TextStyle(fontSize: 24), maxLines: 1,)).toList()
             ),
           )
         ) 
@@ -65,7 +66,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: AutoSizeText(
-                  widget._currentDevice.name + ' actions',
+                  'Actions', //TODO: Добавить Set name в title
                   style: TextStyle(fontSize: 30, color: Colors.white),
                   maxLines: 1,
                 ),
@@ -77,16 +78,16 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
           ),
           _deviceChanger(),
           Divider()
-        ] + getDeviceActionsWidgets(widget._currentDevice),
+        ] + getDeviceActionsWidgets(widget._currentActionsSet),
       ),
     );
   }
 }
 
-List<Widget> getDeviceActionsWidgets(Device device) {
+List<Widget> getDeviceActionsWidgets(ActionsSet set) {
   List<Widget> widgets = <Widget>[];
 
-  for (var action in device.actions) {
+  for (var action in set.actions) {
     widgets.add(ActionWidget(action(), () {
             HomeGridView.globalKey.currentState.addGridElement(Tile(
               TileSize(1, 1), TilePosition(0, 0), action()));

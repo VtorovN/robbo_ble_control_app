@@ -1,5 +1,7 @@
 import 'package:ble_control_app/devices/device.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
+import 'package:ble_control_app/model/Sets.dart';
+import 'package:ble_control_app/model/actions_set.dart';
 
 import 'dart:async';
 
@@ -18,12 +20,12 @@ class Otto extends Device {
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
   @override
-  String name = "Otto";
-  String get getName => name;
+  String _name = "Otto";
+  String get name => _name;
 
   @override
-  List<Function> _actions = <Function>[];
-  List<Function> get actions => _actions;
+  ActionsSet _actionsSet = ActionsSet(); //TODO: Создать Уникальный набор для Otto
+  ActionsSet get actionsSet => _actionsSet;
 
   Otto() {
     savedCharacteristics = {
@@ -33,10 +35,10 @@ class Otto extends Device {
       _rotateServoUUID : null
     };
 
-    _actions.add(super.button);
-    _actions.add(super.sound);
-    _actions.add(super.blink);
-    _actions.add(super.move);
+    _actionsSet.actions.add(ActionsSet.button);
+    _actionsSet.actions.add(ActionsSet.move);
+    _actionsSet.actions.add(ActionsSet.blink);
+    _actionsSet.actions.add(ActionsSet.sound);
   }
 
   Future _initService() async {
