@@ -1,6 +1,5 @@
-import 'package:ble_control_app/devices/device.dart';
 import 'package:ble_control_app/model/actions_set.dart';
-import 'package:ble_control_app/model/base_action.dart';
+import 'package:ble_control_app/actions/base_action.dart';
 import 'package:ble_control_app/model/tile.dart';
 import 'package:ble_control_app/screens/home/home_page.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
@@ -11,14 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class EndDrawerWidget extends StatefulWidget {
-  
-  ActionsSet _currentActionsSet;
-
-  EndDrawerWidget() {
-    if (_currentActionsSet == null) {
-      _currentActionsSet = ActionsSet();
-    }
-  }
+  ActionsSet _currentActionsSet = ActionsSet("empty");
 
   @override
   _EndDrawerWidgetState createState() => _EndDrawerWidgetState();
@@ -45,7 +37,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
                   widget._currentActionsSet = HomePage.sets.getSet(HomePage.devices.elementAt(newValue).name);
                 });
               }, 
-              children: HomePage.sets.get().keys.map<AutoSizeText>((String set) => 
+              children: HomePage.sets.get.keys.map<AutoSizeText>((String set) => 
                 AutoSizeText(set, style: TextStyle(fontSize: 24), maxLines: 1,)).toList()
             ),
           )
@@ -66,7 +58,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: AutoSizeText(
-                  'Actions', //TODO: Добавить Set name в title
+                  "Set " + widget._currentActionsSet.name,
                   style: TextStyle(fontSize: 30, color: Colors.white),
                   maxLines: 1,
                 ),

@@ -432,7 +432,7 @@ class DraggableButtonState extends State<DraggableButton> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0)),
                     builder: (context) =>
-                        EditingModalBottomSheet(widget.tile, widget.key));
+                        EditingModalBottomSheet(widget.tile, widget.key)); //TODO: как и что передавать?
                 modalBottomSheet.whenComplete(
                     () => HomePage.homepageKey.currentState.setState(() {
                           HomePage.homepageKey.currentState.isEditing = false;

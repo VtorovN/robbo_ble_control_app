@@ -1,8 +1,13 @@
-import 'package:ble_control_app/model/base_action.dart';
+import 'package:ble_control_app/actions/base_action.dart';
 import 'package:flutter/material.dart';
 
 class ActionsSet {
+  String _name;
   List<Function> _actions = <Function>[];
+
+  ActionsSet(this._name);
+
+  String get name => _name;
   List<Function> get actions => _actions;
 
   static BaseAction button() => BaseAction(

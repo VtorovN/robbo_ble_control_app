@@ -13,6 +13,8 @@ class BaseAction {
     _pin = 1;
   }
 
+  BaseAction.clone(BaseAction original): this(original.title, original.icon, original.onPressed);
+
   void changeMode() {
     _mode = !_mode;
   }

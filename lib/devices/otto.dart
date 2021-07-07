@@ -1,6 +1,5 @@
 import 'package:ble_control_app/devices/device.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
-import 'package:ble_control_app/model/Sets.dart';
 import 'package:ble_control_app/model/actions_set.dart';
 
 import 'dart:async';
@@ -19,12 +18,10 @@ class Otto extends Device {
 
   Map<String, BluetoothCharacteristic> savedCharacteristics;
 
-  @override
   String _name = "Otto";
   String get name => _name;
 
-  @override
-  ActionsSet _actionsSet = ActionsSet(); //TODO: Создать Уникальный набор для Otto
+  ActionsSet _actionsSet = ActionsSet("Otto"); //TODO: Создать Уникальный набор для Otto
   ActionsSet get actionsSet => _actionsSet;
 
   Otto() {
