@@ -1,6 +1,5 @@
 import 'package:ble_control_app/model/tile.dart';
-import 'package:ble_control_app/screens/home/bottom_sheet_widgets/bottom_sheet_title.dart';
-import 'package:ble_control_app/screens/home/bottom_sheet_widgets/save_button.dart';
+import 'package:ble_control_app/screens/home/bottom_sheet_widgets/bottom_sheet_topbar.dart';
 import 'package:ble_control_app/screens/home/bottom_sheet_widgets/name_changer.dart';
 import 'package:ble_control_app/screens/home/bottom_sheet_widgets/pin_slider.dart';
 import 'package:ble_control_app/screens/home/bottom_sheet_widgets/size_changer.dart';
@@ -43,13 +42,11 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
             child: Scrollbar(
               child: ListView(
                 children: <Widget>[
-                  BottomSheetTitle(widget._bufTile),
-                  NameChanger(widget._bufTile, widget._draggableButtonState),
+                  BottomSheetTopBar(widget._tile, widget._bufTile, widget._draggableButtonState),
+                  NameChanger(widget._bufTile),
                   ModeSwitcher(widget._bufTile),
                   PinSlider(widget._bufTile),
                   SizeChanger(widget._bufTile, _scaffoldKey),
-                  SaveButton(widget._tile, widget._bufTile,
-                      widget._draggableButtonState)
                 ],
               ),
             )));

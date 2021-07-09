@@ -30,10 +30,10 @@ class BaseAction {
   double get pin => this._pin;
   set pin(value) => this._pin = value;
 
-  get title => this._title;
+  String get title => this._title;
   set title(value) => this._title = value;
 
-  get icon => this._icon;
+  Icon get icon => this._icon;
   set icon(value) => this._icon = value;
 
   bool get mode => _mode;
