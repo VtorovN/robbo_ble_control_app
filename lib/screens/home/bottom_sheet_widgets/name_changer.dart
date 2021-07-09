@@ -3,8 +3,9 @@ import 'package:ble_control_app/screens/home/widgets/grid.dart';
 import 'package:flutter/material.dart';
 
 class NameChanger extends StatefulWidget {
-  Tile _tile;
-  GlobalKey<DraggableButtonState> _draggableButtonState;
+  final Tile _tile;
+  final GlobalKey<DraggableButtonState> _draggableButtonState;
+
   NameChanger(this._tile, this._draggableButtonState);
 
   @override

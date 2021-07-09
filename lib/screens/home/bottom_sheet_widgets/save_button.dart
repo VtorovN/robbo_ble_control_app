@@ -4,8 +4,8 @@ import 'package:ble_control_app/screens/home/widgets/grid.dart';
 import 'package:flutter/material.dart';
 
 class SaveButton extends StatelessWidget {
-  Tile _originalTile;
-  Tile _bufTile;
+  final Tile _originalTile;
+  final Tile _bufTile;
   final GlobalKey<DraggableButtonState> _draggableButtonState;
 
   SaveButton(this._originalTile, this._bufTile, this._draggableButtonState);

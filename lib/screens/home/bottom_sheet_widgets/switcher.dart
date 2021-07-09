@@ -2,7 +2,7 @@ import 'package:ble_control_app/model/tile.dart';
 import 'package:flutter/material.dart';
 
 class ModeSwitcher extends StatefulWidget {
-  Tile _tile;
+  final Tile _tile;
   
   ModeSwitcher(this._tile);
 

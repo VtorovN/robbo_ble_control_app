@@ -12,11 +12,12 @@ import 'package:flutter/material.dart';
 
 class EditingModalBottomSheet extends StatefulWidget {
   final Tile _tile;
-  Tile _bufTile;  //TODO: Работать с копией и сохранять на Save
-  // final List<Widget> _widgets; // TODO: Может так? 
+  final Tile _bufTile; //TODO: Работать с копией и сохранять на Save
+  // final List<Widget> _widgets; // TODO: Может так?
   final GlobalKey<DraggableButtonState> _draggableButtonState;
 
-  EditingModalBottomSheet(this._tile, this._draggableButtonState);
+  EditingModalBottomSheet(this._tile, this._draggableButtonState)
+      : _bufTile = Tile.clone(_tile);
 
   @override
   _EditingModalBottomSheetState createState() =>
@@ -28,8 +29,6 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    widget._bufTile = Tile.clone(widget._tile);
-
     final double bottomSheetHeight = MediaQuery.of(context).size.height * 0.6;
 
     return Scaffold(
@@ -48,8 +47,9 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
                   NameChanger(widget._bufTile, widget._draggableButtonState),
                   ModeSwitcher(widget._bufTile),
                   PinSlider(widget._bufTile),
-                  SizeChanger(widget._bufTile, widget._draggableButtonState),
-                  SaveButton(widget._tile, widget._bufTile, widget._draggableButtonState)
+                  SizeChanger(widget._bufTile, _scaffoldKey),
+                  SaveButton(widget._tile, widget._bufTile,
+                      widget._draggableButtonState)
                 ],
               ),
             )));

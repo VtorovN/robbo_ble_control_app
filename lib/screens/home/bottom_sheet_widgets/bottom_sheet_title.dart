@@ -3,7 +3,8 @@ import 'package:ble_control_app/model/tile.dart';
 import 'package:flutter/material.dart';
 
 class BottomSheetTitle extends StatefulWidget {
-  Tile _tile;
+  final Tile _tile;
+
   BottomSheetTitle(this._tile);
 
   @override

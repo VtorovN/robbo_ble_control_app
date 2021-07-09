@@ -3,17 +3,18 @@ import 'package:ble_control_app/screens/home/widgets/grid.dart';
 import 'package:flutter/material.dart';
 
 class SizeChanger extends StatefulWidget {
-  Tile _tile;
-  GlobalKey<DraggableButtonState> _draggableButtonState;
+  final Tile _tile;
+  final GlobalKey<ScaffoldState> _scaffoldKey;
 
-  SizeChanger(this._tile, this._draggableButtonState);
+  SizeChanger(this._tile, this._scaffoldKey);
 
   @override
   _SizeChangerState createState() => _SizeChangerState();
 }
 
 class _SizeChangerState extends State<SizeChanger> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  int currentWidth;
+  int currentHeight;
 
   Widget _sizeDropDownButton(bool axis, int dropdownValue) {
     return DropdownButton<int>(
@@ -22,6 +23,10 @@ class _SizeChangerState extends State<SizeChanger> {
         height: 1,
       ),
       onChanged: (int newValue) {
+        setState(() {
+          axis ? currentWidth = newValue : currentHeight = newValue;
+        });
+
         bool hasPlace = HomeGridView.globalKey.currentState
             .hasPlaceExcludingOldButton(
                 widget._tile.position.x,
@@ -33,16 +38,13 @@ class _SizeChangerState extends State<SizeChanger> {
                 widget._tile.position.x,
                 widget._tile.position.y);
         if (hasPlace) {
-          setState(() {
-            HomeGridView.globalKey.currentState.resizeTileAndRebuild(
-              widget._tile,
+          widget._tile.size = TileSize(
               axis ? newValue : widget._tile.size.width,
-              axis ? widget._tile.size.height : newValue,
-            );
-          });
+              axis ? widget._tile.size.height : newValue
+          );
         } else {
           final scaffoldMessenger =
-              ScaffoldMessenger.of(_scaffoldKey.currentContext);
+              ScaffoldMessenger.of(widget._scaffoldKey.currentContext);
           scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text('Cannot resize button: not enough space'),
@@ -66,6 +68,9 @@ class _SizeChangerState extends State<SizeChanger> {
 
   @override
   Widget build(BuildContext context) {
+    currentWidth = widget._tile.size.width;
+    currentHeight = widget._tile.size.height;
+
     return Container(
       // SizeChanger
       height: 50,
@@ -75,11 +80,11 @@ class _SizeChangerState extends State<SizeChanger> {
           Text(
             "width:",
           ),
-          _sizeDropDownButton(true, widget._tile.size.width),
+          _sizeDropDownButton(true, currentWidth),
           Text(
             "height:",
           ),
-          _sizeDropDownButton(false, widget._tile.size.height)
+          _sizeDropDownButton(false, currentHeight)
         ],
       ),
     );

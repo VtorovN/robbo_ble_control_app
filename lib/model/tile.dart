@@ -1,5 +1,5 @@
 import 'package:ble_control_app/actions/base_action.dart';
-import 'package:flutter/material.dart';
+import 'package:ble_control_app/screens/home/widgets/grid.dart';
 
 class TileSize {
   int _height;
@@ -39,6 +39,11 @@ class Tile {
 
   void matchTo(Tile tile) {
     _action.matchTo(tile.action);
+    HomeGridView.globalKey.currentState.resizeTileAndRebuild(
+      tile,
+      tile.size.width,
+      tile.size.height,
+    );
   }
 
   get size => this._size;

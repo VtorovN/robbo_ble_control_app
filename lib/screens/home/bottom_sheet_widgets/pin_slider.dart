@@ -2,7 +2,7 @@ import 'package:ble_control_app/model/tile.dart';
 import 'package:flutter/material.dart';
 
 class PinSlider extends StatefulWidget {
-  Tile _tile;
+  final Tile _tile;
   
   PinSlider(this._tile);
 
