@@ -37,6 +37,10 @@ class Tile {
   Tile(this._size, this._position, this._action);
   Tile.clone(Tile original): this(TileSize.clone(original.size), TilePosition.clone(original.position), BaseAction.clone(original.action));
 
+  void matchTo(Tile tile) {
+    _action.matchTo(tile.action);
+  }
+
   get size => this._size;
   set size(value) => this._size = value;
 

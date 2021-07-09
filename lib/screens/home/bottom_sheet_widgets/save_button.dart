@@ -1,11 +1,14 @@
+import 'package:ble_control_app/model/tile.dart';
 import 'package:ble_control_app/screens/home/home_page.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
 import 'package:flutter/material.dart';
 
-class DoneButton extends StatelessWidget {
+class SaveButton extends StatelessWidget {
+  Tile _originalTile;
+  Tile _bufTile;
   final GlobalKey<DraggableButtonState> _draggableButtonState;
 
-  DoneButton(this._draggableButtonState);
+  SaveButton(this._originalTile, this._bufTile, this._draggableButtonState);
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +17,8 @@ class DoneButton extends StatelessWidget {
       alignment: Alignment.bottomRight,
       padding: EdgeInsets.only(right: 15),
       child: ElevatedButton.icon(
-        icon: Icon(Icons.done, size: 20),
-        label: Text('Done',
+        icon: Icon(Icons.save_outlined, size: 20),
+        label: Text('Save',
             style: TextStyle(
                 fontSize: 20, fontWeight: FontWeight.bold)),
         style: ElevatedButton.styleFrom(
@@ -24,6 +27,9 @@ class DoneButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
+          _draggableButtonState.currentState.setState(() {
+            _originalTile.matchTo(_bufTile);
+          });
           HomePage.homepageKey.currentState.setState(() {
             HomePage.homepageKey.currentState.isEditing = false;
           });

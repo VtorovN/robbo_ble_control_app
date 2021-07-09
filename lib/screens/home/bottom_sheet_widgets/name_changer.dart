@@ -27,11 +27,11 @@ class _NameChangerState extends State<NameChanger> {
         maxLength: 20,
         initialValue: widget._tile.action.title,
         onChanged: (text) {
-          widget._draggableButtonState.currentState.setState(() {
+          // widget._draggableButtonState.currentState.setState(() {
             setState(() {
               widget._tile.action.title = text;
             });
-          });
+          // });
         },
       ),
     );

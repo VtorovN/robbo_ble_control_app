@@ -13,36 +13,48 @@ class ActionsSet {
   static BaseAction button() => BaseAction(
       "Button",
       Icon(Icons.create),
-      () {}
+      () {},
+      false,
+      1
   );
 
   static BaseAction blink() => BaseAction(
       "Blink",
       Icon(Icons.lightbulb),
-      () {}
+      () {},
+      false,
+      1
   );
 
   static BaseAction move() => BaseAction(
       "Move",
       Icon(Icons.accessibility),
-      () {}
+      () {},
+      false,
+      1
   );
 
   static BaseAction sound () => BaseAction(
       "Sound",
       Icon(Icons.audiotrack),
-      () {}
+      () {},
+      false,
+      1
   );
 
   static BaseAction turnLeft() => BaseAction(
       "Turn Left",
       Icon(Icons.arrow_left),
-      () {}
+      () {},
+      false,
+      1
   );
 
   static BaseAction turnRight() => BaseAction(
       "Turn Right",
       Icon(Icons.arrow_right),
-      () {}
+      () {},
+      false,
+      1
   );
 }

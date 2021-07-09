@@ -8,12 +8,17 @@ class BaseAction {
   bool _mode; // High-Low
   double _pin;
   
-  BaseAction(this._title, this._icon, this._onPressed) {
-    _mode = false;
-    _pin = 1;
-  }
+  BaseAction(this._title, this._icon, this._onPressed, this._mode, this._pin);
 
-  BaseAction.clone(BaseAction original): this(original.title, original.icon, original.onPressed);
+  BaseAction.clone(BaseAction original): this(original.title, original.icon, original.onPressed, original.mode, original.pin);
+
+  void matchTo(BaseAction action) {
+    _title = action.title;
+    _icon = action.icon;
+    _onPressed = action.onPressed;
+    _mode = action.mode;
+    _pin = action.pin;
+  }
 
   void changeMode() {
     _mode = !_mode;
