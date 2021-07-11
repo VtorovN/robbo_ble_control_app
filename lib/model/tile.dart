@@ -10,11 +10,11 @@ class TileSize {
   TileSize(this._width, this._height);
   TileSize.clone(TileSize original): this(original.width, original.height);
 
-  get height => this._height;
-  set height(int value) => this._height = value;
+  get height => _height;
+  set height(int value) => _height = value;
 
-  get width => this._width;
-  set width(int value) => this._width = value;
+  get width => _width;
+  set width(int value) => _width = value;
 }
 
 class TilePosition {
@@ -24,11 +24,11 @@ class TilePosition {
   TilePosition(this._x, this._y);
   TilePosition.clone(TilePosition original): this(original.x, original.y);
 
-  get x => this._x;
-  set x(int value) => this._x = value;
+  get x => _x;
+  set x(int value) => _x = value;
 
-  get y => this._y;
-  set y(int value) => this._y = value;
+  get y => _y;
+  set y(int value) => _y = value;
 }
 
 class Tile {
@@ -51,12 +51,12 @@ class Tile {
     );
   }
 
-  get size => this._size;
-  set size(value) => this._size = value;
+  get size => _size;
+  set size(value) => _size = value;
 
-  get position => this._position;
-  set position(value) => this._position = value;
+  get position => _position;
+  set position(value) => _position = value;
 
-  get action => this._action;
-  set action(value) => this.action = value;
+  get action => _action;
+  set action(value) => _action = value;
 }

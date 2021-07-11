@@ -11,11 +11,9 @@ import 'package:flutter/material.dart';
 
 class EditingModalBottomSheet extends StatefulWidget {
   final Tile _tile;
-  final Tile _bufTile; //TODO: Работать с копией и сохранять на Save
   final GlobalKey<DraggableButtonState> _draggableButtonState;
 
-  EditingModalBottomSheet(this._tile, this._draggableButtonState)
-      : _bufTile = Tile.clone(_tile);
+  EditingModalBottomSheet(this._tile, this._draggableButtonState);
 
   @override
   _EditingModalBottomSheetState createState() =>
@@ -24,12 +22,20 @@ class EditingModalBottomSheet extends StatefulWidget {
 
 class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Tile bufTile;
+
+  @override
+  void initState() {
+    super.initState();
+    bufTile = Tile.clone(widget._tile);
+  }
 
   @override
   Widget build(BuildContext context) {
     final double bottomSheetHeight = MediaQuery.of(context).size.height * 0.6;
 
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         key: _scaffoldKey,
         body: Container(
           height: bottomSheetHeight,
@@ -41,11 +47,11 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
           child: Scrollbar(
             child: ListView(
               children:  <Widget> [
-                BottomSheetTopBar(widget._tile, widget._bufTile, widget._draggableButtonState),
-                NameChanger(widget._bufTile),
-                ModeSwitcher(widget._bufTile),
-                PinSlider(widget._bufTile),
-                SizeChanger(widget._bufTile, _scaffoldKey),
+                BottomSheetTopBar(widget._tile, bufTile, widget._draggableButtonState),
+                NameChanger(bufTile),
+                ModeSwitcher(bufTile),
+                PinSlider(bufTile),
+                SizeChanger(bufTile, _scaffoldKey),
               ],
             )
           )

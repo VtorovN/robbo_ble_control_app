@@ -25,7 +25,7 @@ class _NameChangerState extends State<NameChanger> {
             labelStyle: TextStyle(color: Colors.black38)),
         maxLength: 20,
         initialValue: widget._tile.action.title,
-        onChanged: (text) {
+        onFieldSubmitted: (text) {
           setState(() {
             widget._tile.action.title = text;
           });

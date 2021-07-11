@@ -26,17 +26,17 @@ class BasicAction {
   }
 
   Function get onPressed => _onPressed;
-  set onPressed(Function value) => this._onPressed = value;
+  set onPressed(Function value) => _onPressed = value;
 
-  double get pin => this._pin;
-  set pin(value) => this._pin = value;
+  double get pin => _pin;
+  set pin(value) => _pin = value;
 
-  String get title => this._title;
-  set title(value) => this._title = value;
+  String get title => _title;
+  set title(value) => _title = value;
 
-  Icon get icon => this._icon;
-  set icon(value) => this._icon = value;
+  Icon get icon => _icon;
+  set icon(value) => _icon = value;
 
   bool get mode => _mode;
-  set mode(value) => this._mode = value;
+  set mode(value) => _mode = value;
 }
