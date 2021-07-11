@@ -1,5 +1,4 @@
 import 'package:ble_control_app/model/tile.dart';
-import 'package:ble_control_app/screens/home/widgets/grid.dart';
 import 'package:flutter/material.dart';
 
 class NameChanger extends StatefulWidget {

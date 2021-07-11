@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 class EditingModalBottomSheet extends StatefulWidget {
   final Tile _tile;
   final Tile _bufTile; //TODO: Работать с копией и сохранять на Save
-  // final List<Widget> _widgets; // TODO: Может так?
   final GlobalKey<DraggableButtonState> _draggableButtonState;
 
   EditingModalBottomSheet(this._tile, this._draggableButtonState)
@@ -33,22 +32,24 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
     return Scaffold(
         key: _scaffoldKey,
         body: Container(
-            height: bottomSheetHeight,
-            padding: const EdgeInsets.all(6.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.green, width: 2.0),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Scrollbar(
-              child: ListView(
-                children: <Widget>[
-                  BottomSheetTopBar(widget._tile, widget._bufTile, widget._draggableButtonState),
-                  NameChanger(widget._bufTile),
-                  ModeSwitcher(widget._bufTile),
-                  PinSlider(widget._bufTile),
-                  SizeChanger(widget._bufTile, _scaffoldKey),
-                ],
-              ),
-            )));
+          height: bottomSheetHeight,
+          padding: const EdgeInsets.all(6.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.green, width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Scrollbar(
+            child: ListView(
+              children:  <Widget> [
+                BottomSheetTopBar(widget._tile, widget._bufTile, widget._draggableButtonState),
+                NameChanger(widget._bufTile),
+                ModeSwitcher(widget._bufTile),
+                PinSlider(widget._bufTile),
+                SizeChanger(widget._bufTile, _scaffoldKey),
+              ],
+            )
+          )
+        )
+    );
   }
-}
+}  

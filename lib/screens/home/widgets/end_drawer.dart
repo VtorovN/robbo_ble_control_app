@@ -1,5 +1,5 @@
 import 'package:ble_control_app/model/actions_set.dart';
-import 'package:ble_control_app/actions/base_action.dart';
+import 'package:ble_control_app/actions/basic_action.dart';
 import 'package:ble_control_app/model/tile.dart';
 import 'package:ble_control_app/screens/home/home_page.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
@@ -10,13 +10,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class EndDrawerWidget extends StatefulWidget {
-  ActionsSet _currentActionsSet = ActionsSet("empty");
-
   @override
   _EndDrawerWidgetState createState() => _EndDrawerWidgetState();
 }
 
 class _EndDrawerWidgetState extends State<EndDrawerWidget> {
+  ActionsSet _currentActionsSet = ActionsSet("empty");
+
   Widget _deviceChanger() {
     return Container (
       height: 50,
@@ -34,7 +34,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               itemExtent: 40, 
               onSelectedItemChanged: (newValue) {
                 setState(() {
-                  widget._currentActionsSet = HomePage.sets.getSet(HomePage.devices.elementAt(newValue).name);
+                  _currentActionsSet = HomePage.sets.getSet(HomePage.devices.elementAt(newValue).name);
                 });
               }, 
               children: HomePage.sets.get.keys.map<AutoSizeText>((String set) => 
@@ -58,7 +58,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: AutoSizeText(
-                  "Set " + widget._currentActionsSet.name,
+                  "Set " + _currentActionsSet.name,
                   style: TextStyle(fontSize: 30, color: Colors.white),
                   maxLines: 1,
                 ),
@@ -70,7 +70,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
           ),
           _deviceChanger(),
           Divider()
-        ] + getDeviceActionsWidgets(widget._currentActionsSet),
+        ] + getDeviceActionsWidgets(_currentActionsSet),
       ),
     );
   }
@@ -80,16 +80,16 @@ List<Widget> getDeviceActionsWidgets(ActionsSet set) {
   List<Widget> widgets = <Widget>[];
 
   for (var action in set.actions) {
-    widgets.add(ActionWidget(action(), () {
-            HomeGridView.globalKey.currentState.addGridElement(Tile(
-              TileSize(1, 1), TilePosition(0, 0), action()));
-          }));
+    widgets.add(ActionWidget(action(), _creationFunc(action())));
   }
   return widgets;
 }
 
+Function _creationFunc(BasicAction action) => 
+  () => HomeGridView.globalKey.currentState.addGridElement(Tile(TileSize(1, 1), TilePosition(0, 0), action));
+
 class ActionWidget extends StatelessWidget {
-  final BaseAction _action;
+  final BasicAction _action;
   final Function _creationFunc;
 
   ActionWidget(this._action, this._creationFunc);
@@ -97,14 +97,14 @@ class ActionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-        title: AutoSizeText(
-          _action.title,
-          maxLines: 2,
-        ),
-        leading: _action.icon,
-        onTap: () {
-          _creationFunc();
-          Navigator.pop(context);
-        });
+      title: AutoSizeText(
+        _action.title,
+        maxLines: 2,
+      ),
+      leading: _action.icon,
+      onTap: () {
+        _creationFunc();
+        Navigator.pop(context);
+      });
   }
 }

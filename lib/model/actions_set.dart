@@ -1,7 +1,7 @@
-import 'package:ble_control_app/actions/base_action.dart';
+import 'package:ble_control_app/actions/basic_action.dart';
 import 'package:flutter/material.dart';
 
-class ActionsSet {
+class ActionsSet { // Реализация Одного набора
   String _name;
   List<Function> _actions = <Function>[];
 
@@ -10,7 +10,7 @@ class ActionsSet {
   String get name => _name;
   List<Function> get actions => _actions;
 
-  static BaseAction button() => BaseAction(
+  static BasicAction button() => BasicAction(
       "Button",
       Icon(Icons.create),
       () {},
@@ -18,7 +18,7 @@ class ActionsSet {
       1
   );
 
-  static BaseAction blink() => BaseAction(
+  static BasicAction blink() => BasicAction(
       "Blink",
       Icon(Icons.lightbulb),
       () {},
@@ -26,7 +26,7 @@ class ActionsSet {
       1
   );
 
-  static BaseAction move() => BaseAction(
+  static BasicAction move() => BasicAction(
       "Move",
       Icon(Icons.accessibility),
       () {},
@@ -34,7 +34,7 @@ class ActionsSet {
       1
   );
 
-  static BaseAction sound () => BaseAction(
+  static BasicAction sound () => BasicAction(
       "Sound",
       Icon(Icons.audiotrack),
       () {},
@@ -42,7 +42,7 @@ class ActionsSet {
       1
   );
 
-  static BaseAction turnLeft() => BaseAction(
+  static BasicAction turnLeft() => BasicAction(
       "Turn Left",
       Icon(Icons.arrow_left),
       () {},
@@ -50,7 +50,7 @@ class ActionsSet {
       1
   );
 
-  static BaseAction turnRight() => BaseAction(
+  static BasicAction turnRight() => BasicAction(
       "Turn Right",
       Icon(Icons.arrow_right),
       () {},

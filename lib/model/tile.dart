@@ -1,4 +1,6 @@
-import 'package:ble_control_app/actions/base_action.dart';
+import 'package:ble_control_app/actions/basic_action.dart';
+import 'package:ble_control_app/model/editor.dart';
+import 'package:ble_control_app/screens/home/widgets/editing_bottom_sheet.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
 
 class TileSize {
@@ -32,10 +34,13 @@ class TilePosition {
 class Tile {
   TileSize _size;
   TilePosition _position;
-  BaseAction _action;
+  BasicAction _action;
 
+  EditingModalBottomSheet _editingModalBottomSheet; // TODO: Как все нормально связать?
+  Editor _editor;
+  
   Tile(this._size, this._position, this._action);
-  Tile.clone(Tile original): this(TileSize.clone(original.size), TilePosition.clone(original.position), BaseAction.clone(original.action));
+  Tile.clone(Tile original): this(TileSize.clone(original.size), TilePosition.clone(original.position), BasicAction.clone(original.action));
 
   void matchTo(Tile tile) {
     _action.matchTo(tile.action);

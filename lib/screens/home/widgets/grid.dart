@@ -1,6 +1,6 @@
 import 'package:ble_control_app/model/tile.dart';
 import 'package:ble_control_app/screens/home/home_page.dart';
-import 'package:ble_control_app/screens/home/widgets/bottom_sheet.dart';
+import 'package:ble_control_app/screens/home/widgets/editing_bottom_sheet.dart';
 
 import 'package:auto_size_text/auto_size_text.dart';
 
@@ -392,6 +392,14 @@ class DraggableButton extends StatefulWidget {
 }
 
 class DraggableButtonState extends State<DraggableButton> {
+  EditingModalBottomSheet _bottomSheet;
+
+  @override
+  void initState() { 
+    super.initState();
+    _bottomSheet = EditingModalBottomSheet(widget._tile, widget.key);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -425,36 +433,38 @@ class DraggableButtonState extends State<DraggableButton> {
           ),
         ),
         child: ElevatedButton(
-            onPressed: () {
-              if (HomePage.homepageKey.currentState.isEditing) {
-                var modalBottomSheet = showModalBottomSheet(
-                    context: context,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0)),
-                    builder: (context) =>
-                        EditingModalBottomSheet(widget.tile, widget.key)); //TODO: как и что передавать?
-                modalBottomSheet.whenComplete(
-                    () => HomePage.homepageKey.currentState.setState(() {
-                          HomePage.homepageKey.currentState.isEditing = false;
-                        }));
-              } else {
-                widget.tile.action.onPressed();
-              }
-            },
-            style: ElevatedButton.styleFrom(
+          onPressed: () {
+            if (HomePage.homepageKey.currentState.isEditing) {
+              var modalBottomSheet = showModalBottomSheet(
+                context: context,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                primary: Colors.green.shade300),
-            child: Container(
-                child: AutoSizeText(
+                  borderRadius: BorderRadius.circular(10.0)),
+                builder: (context) =>
+                  _bottomSheet //TODO: как и что передавать?
+              );
+              modalBottomSheet.whenComplete(
+                () => HomePage.homepageKey.currentState.setState(() {
+                    HomePage.homepageKey.currentState.isEditing = false;
+                  }));
+            } else {
+              widget.tile.action.onPressed();
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            primary: Colors.green.shade300),
+          child: Container(
+            child: AutoSizeText(
               widget.tile.action.title,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 25),
               maxLines: 2,
               wrapWords: false,
               overflow: TextOverflow.clip,
-            ))),
+              minFontSize: 6,
+          ))),
       );
     });
   }

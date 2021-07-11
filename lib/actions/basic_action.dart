@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class BaseAction {
+class BasicAction {
   String _title;
   Icon _icon;
   Function _onPressed;
   bool _mode; // High-Low
   double _pin;
-  
-  BaseAction(this._title, this._icon, this._onPressed, this._mode, this._pin);
 
-  BaseAction.clone(BaseAction original): this(original.title, original.icon, original.onPressed, original.mode, original.pin);
+  BasicAction(this._title, this._icon, this._onPressed, this._mode, this._pin);
 
-  void matchTo(BaseAction action) {
+  BasicAction.clone(BasicAction original)
+    : this(original.title, original.icon, original.onPressed, original.mode, original.pin);
+
+  void matchTo(BasicAction action) {
     _title = action.title;
     _icon = action.icon;
     _onPressed = action.onPressed;
