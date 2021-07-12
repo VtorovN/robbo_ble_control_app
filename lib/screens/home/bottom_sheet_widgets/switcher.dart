@@ -1,16 +1,25 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ble_control_app/model/tile.dart';
+import 'package:ble_control_app/screens/home/bottom_sheet_widgets/bottom_sheet_widget.dart';
+import 'package:ble_control_app/screens/home/widgets/draggable_button.dart';
 import 'package:flutter/material.dart';
 
-class ModeSwitcher extends StatefulWidget {
-  final Tile _tile;
-  
-  ModeSwitcher(this._tile);
-
-  @override
-  _ModeSwitcherState createState() => _ModeSwitcherState();
+class ModeSwitcher implements BottomSheetWidget {
+  ModeSwitcher();
+  Widget get(Tile bufTile, Tile tile, GlobalKey<DraggableButtonState> draggableButtonState, GlobalKey<ScaffoldState> scaffoldKey)
+    => ModeSwitcherWidget(bufTile);
 }
 
-class _ModeSwitcherState extends State<ModeSwitcher> {
+class ModeSwitcherWidget extends StatefulWidget {
+  final Tile _tile;
+  
+  ModeSwitcherWidget(this._tile);
+
+  @override
+  _ModeSwitcherWidgetState createState() => _ModeSwitcherWidgetState();
+}
+
+class _ModeSwitcherWidgetState extends State<ModeSwitcherWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,7 +31,7 @@ class _ModeSwitcherState extends State<ModeSwitcher> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          AutoSizeText(
             "switch",
             style: TextStyle(
                 fontSize: 25, fontWeight: FontWeight.bold),
@@ -38,7 +47,7 @@ class _ModeSwitcherState extends State<ModeSwitcher> {
               },
             ),
           ),
-          Text(
+          AutoSizeText(
             "hold",
             style: TextStyle(
                 fontSize: 25, fontWeight: FontWeight.bold),

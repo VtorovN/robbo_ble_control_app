@@ -1,16 +1,25 @@
 import 'package:ble_control_app/model/tile.dart';
+import 'package:ble_control_app/screens/home/widgets/draggable_button.dart';
 import 'package:flutter/material.dart';
 
-class PinSlider extends StatefulWidget {
-  final Tile _tile;
-  
-  PinSlider(this._tile);
+import 'bottom_sheet_widget.dart';
 
-  @override
-  _PinSliderState createState() => _PinSliderState();
+class PinSlider implements BottomSheetWidget {
+  PinSlider();
+  Widget get(Tile bufTile, Tile tile, GlobalKey<DraggableButtonState> draggableButtonState, GlobalKey<ScaffoldState> scaffoldKey)
+    => PinSliderWidget(bufTile);
 }
 
-class _PinSliderState extends State<PinSlider> {
+class PinSliderWidget extends StatefulWidget {
+  final Tile _tile;
+  
+  PinSliderWidget(this._tile);
+
+  @override
+  _PinSliderWidgetState createState() => _PinSliderWidgetState();
+}
+
+class _PinSliderWidgetState extends State<PinSliderWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(

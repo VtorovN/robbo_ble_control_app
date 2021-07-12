@@ -1,5 +1,5 @@
 import 'package:ble_control_app/devices/device.dart';
-import 'package:ble_control_app/model/actions_set.dart';
+import 'package:ble_control_app/actions/actions_set.dart';
 
 class RobboPlatform extends Device {
   String _name = "Robbo Platform";

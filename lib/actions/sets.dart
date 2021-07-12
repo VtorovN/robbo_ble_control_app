@@ -1,10 +1,11 @@
 import 'package:ble_control_app/devices/device.dart';
-import 'package:ble_control_app/model/actions_set.dart';
+
+import 'actions_set.dart';
 
 class Sets { // Тут просто список наборов
   Map<String, ActionsSet> _sets =  Map<String, ActionsSet>();
 
-  Sets(List<Device> devices) {  
+  Sets.device(List<Device> devices) {  
     for (var device in devices) {
       _sets.addAll({device.name : device.actionsSet});
     }

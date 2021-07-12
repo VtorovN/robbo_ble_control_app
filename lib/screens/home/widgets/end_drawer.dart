@@ -1,4 +1,4 @@
-import 'package:ble_control_app/model/actions_set.dart';
+import 'package:ble_control_app/actions/actions_set.dart';
 import 'package:ble_control_app/actions/basic_action.dart';
 import 'package:ble_control_app/model/tile.dart';
 import 'package:ble_control_app/screens/home/home_page.dart';

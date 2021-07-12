@@ -1,4 +1,4 @@
-import 'package:ble_control_app/model/actions_set.dart';
+import 'package:ble_control_app/actions/actions_set.dart';
 
 abstract class Device {
   String _name;

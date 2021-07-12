@@ -1,22 +1,30 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ble_control_app/model/tile.dart';
-import 'package:ble_control_app/screens/home/widgets/grid.dart';
+import 'package:ble_control_app/screens/home/bottom_sheet_widgets/bottom_sheet_widget.dart';
+import 'package:ble_control_app/screens/home/widgets/draggable_button.dart';
 import 'package:flutter/material.dart';
 
 import '../home_page.dart';
 
-class BottomSheetTopBar extends StatefulWidget {
-  final Tile _originalTile;
-  final Tile _bufTile;
-  final GlobalKey<DraggableButtonState> _draggableButtonState;
-
-  BottomSheetTopBar(this._originalTile, this._bufTile, this._draggableButtonState);
-
+class BottomSheetTopBar implements BottomSheetWidget {
+  BottomSheetTopBar();
   @override
-  _BottomSheetTopBarState createState() => _BottomSheetTopBarState();
+  Widget get(Tile bufTile, Tile tile, GlobalKey<DraggableButtonState> draggableButtonState, GlobalKey<ScaffoldState> scaffoldKey)
+    => BottomSheetTopBarWidget(bufTile, tile, draggableButtonState);
 }
 
-class _BottomSheetTopBarState extends State<BottomSheetTopBar> {
+class BottomSheetTopBarWidget extends StatefulWidget {
+  final Tile _bufTile;
+  final Tile _originalTile;
+  final GlobalKey<DraggableButtonState> _draggableButtonState;
+
+  BottomSheetTopBarWidget(this._bufTile, this._originalTile, this._draggableButtonState);
+
+  @override
+  _BottomSheetTopBarWidgetState createState() => _BottomSheetTopBarWidgetState();
+}
+
+class _BottomSheetTopBarWidgetState extends State<BottomSheetTopBarWidget> {
   @override
   Widget build(BuildContext context) {
     return 

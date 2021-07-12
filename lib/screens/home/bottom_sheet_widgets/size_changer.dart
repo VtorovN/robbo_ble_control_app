@@ -1,18 +1,27 @@
 import 'package:ble_control_app/model/tile.dart';
+import 'package:ble_control_app/screens/home/widgets/draggable_button.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
 import 'package:flutter/material.dart';
 
-class SizeChanger extends StatefulWidget {
+import 'bottom_sheet_widget.dart';
+
+class SizeChanger implements BottomSheetWidget {
+  SizeChanger();
+  Widget get(Tile bufTile, Tile tile, GlobalKey<DraggableButtonState> draggableButtonState, GlobalKey<ScaffoldState> scaffoldKey)
+    => SizeChangerWidget(bufTile, scaffoldKey);
+}
+
+class SizeChangerWidget extends StatefulWidget {
   final Tile _tile;
   final GlobalKey<ScaffoldState> _scaffoldKey;
 
-  SizeChanger(this._tile, this._scaffoldKey);
+  SizeChangerWidget(this._tile, this._scaffoldKey);
 
   @override
-  _SizeChangerState createState() => _SizeChangerState();
+  _SizeChangerWidgetState createState() => _SizeChangerWidgetState();
 }
 
-class _SizeChangerState extends State<SizeChanger> {
+class _SizeChangerWidgetState extends State<SizeChangerWidget> {
   int currentWidth;
   int currentHeight;
 

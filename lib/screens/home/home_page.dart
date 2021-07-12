@@ -1,7 +1,7 @@
+import 'package:ble_control_app/actions/sets.dart';
 import 'package:ble_control_app/devices/device.dart';
 import 'package:ble_control_app/devices/otto.dart';
 import 'package:ble_control_app/devices/robbo_platform.dart';
-import 'package:ble_control_app/model/Sets.dart';
 import 'package:ble_control_app/screens/home/widgets/drawer.dart';
 import 'package:ble_control_app/screens/home/widgets/end_drawer.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
   static final List<Device> devices = <Device>[new Otto(), new RobboPlatform()];
-  static Sets sets = Sets(devices);
+  static Sets sets = Sets.device(devices);
 
   static final GlobalKey<_HomePageState> _homepageKey = GlobalKey<_HomePageState>();
   final AutoSizeText title;

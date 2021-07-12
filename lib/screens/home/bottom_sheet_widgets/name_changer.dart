@@ -1,16 +1,25 @@
 import 'package:ble_control_app/model/tile.dart';
+import 'package:ble_control_app/screens/home/bottom_sheet_widgets/bottom_sheet_widget.dart';
+import 'package:ble_control_app/screens/home/widgets/draggable_button.dart';
 import 'package:flutter/material.dart';
 
-class NameChanger extends StatefulWidget {
-  final Tile _tile;
-
-  NameChanger(this._tile);
-
+class NameChanger implements BottomSheetWidget {
+  NameChanger();
   @override
-  _NameChangerState createState() => _NameChangerState();
+  Widget get(Tile bufTile, Tile tile, GlobalKey<DraggableButtonState> draggableButtonState, GlobalKey<ScaffoldState> scaffoldKey)
+    => NameChangerWidget(bufTile);
 }
 
-class _NameChangerState extends State<NameChanger> {
+class NameChangerWidget extends StatefulWidget {
+  final Tile _tile;
+
+  NameChangerWidget(this._tile);
+
+  @override
+  _NameChangerWidgetState createState() => _NameChangerWidgetState();
+}
+
+class _NameChangerWidgetState extends State<NameChangerWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(

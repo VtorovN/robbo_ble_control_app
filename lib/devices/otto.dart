@@ -1,6 +1,6 @@
 import 'package:ble_control_app/devices/device.dart';
 import 'package:ble_control_app/bluetooth/ble_api.dart';
-import 'package:ble_control_app/model/actions_set.dart';
+import 'package:ble_control_app/actions/actions_set.dart';
 
 import 'dart:async';
 

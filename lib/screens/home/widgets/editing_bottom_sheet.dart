@@ -1,10 +1,5 @@
 import 'package:ble_control_app/model/tile.dart';
-import 'package:ble_control_app/screens/home/bottom_sheet_widgets/bottom_sheet_topbar.dart';
-import 'package:ble_control_app/screens/home/bottom_sheet_widgets/name_changer.dart';
-import 'package:ble_control_app/screens/home/bottom_sheet_widgets/pin_slider.dart';
-import 'package:ble_control_app/screens/home/bottom_sheet_widgets/size_changer.dart';
-import 'package:ble_control_app/screens/home/bottom_sheet_widgets/switcher.dart';
-import 'package:ble_control_app/screens/home/widgets/grid.dart';
+import 'package:ble_control_app/screens/home/widgets/draggable_button.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -46,13 +41,8 @@ class _EditingModalBottomSheetState extends State<EditingModalBottomSheet> {
           ),
           child: Scrollbar(
             child: ListView(
-              children:  <Widget> [
-                BottomSheetTopBar(widget._tile, bufTile, widget._draggableButtonState),
-                NameChanger(bufTile),
-                ModeSwitcher(bufTile),
-                PinSlider(bufTile),
-                SizeChanger(bufTile, _scaffoldKey),
-              ],
+              children: widget._tile.widgets.map(
+                (e) => e.get(bufTile, widget._tile, widget._draggableButtonState, widget.key)).toList()
             )
           )
         )

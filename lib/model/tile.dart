@@ -1,7 +1,7 @@
 import 'package:ble_control_app/actions/basic_action.dart';
-import 'package:ble_control_app/model/editor.dart';
-import 'package:ble_control_app/screens/home/widgets/editing_bottom_sheet.dart';
+import 'package:ble_control_app/screens/home/bottom_sheet_widgets/bottom_sheet_widget.dart';
 import 'package:ble_control_app/screens/home/widgets/grid.dart';
+import 'package:flutter/material.dart';
 
 class TileSize {
   int _height;
@@ -36,9 +36,6 @@ class Tile {
   TilePosition _position;
   BasicAction _action;
 
-  EditingModalBottomSheet _editingModalBottomSheet; // TODO: Как все нормально связать?
-  Editor _editor;
-  
   Tile(this._size, this._position, this._action);
   Tile.clone(Tile original): this(TileSize.clone(original.size), TilePosition.clone(original.position), BasicAction.clone(original.action));
 
@@ -50,6 +47,8 @@ class Tile {
       tile.size.height,
     );
   }
+
+  List<BottomSheetWidget> get widgets => _action.widgets;
 
   get size => _size;
   set size(value) => _size = value;
